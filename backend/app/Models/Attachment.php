@@ -14,7 +14,10 @@ class Attachment extends Model
         'transaction_id',
         'project_id',
         'file_path',
+        'file_data',
         'file_type',
+        'mime_type',
+        'file_size',
         'extracted_text',
         'status',
     ];

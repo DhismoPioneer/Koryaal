@@ -153,7 +153,10 @@ class DailyReportController extends Controller
                     'daily_report_id' => $report->id,
                     'project_id' => $report->project_id,
                     'file_path' => $file->store('attachments/daily-reports', 'public'),
+                    'file_data' => file_get_contents($file->getRealPath()),
                     'file_type' => $this->detectAttachmentType($file->getClientOriginalExtension(), $file->getMimeType()),
+                    'mime_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
                     'extracted_text' => $file->getClientOriginalName(),
                     'status' => 'pending',
                 ]);
@@ -364,9 +367,4 @@ class DailyReportController extends Controller
         }
     }
 }
-
-
-
-
-
 
