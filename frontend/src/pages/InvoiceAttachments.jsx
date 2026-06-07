@@ -76,6 +76,7 @@ export default function InvoiceAttachments() {
   }
 
   const attachments = getAttachments(data)
+  const fileUrl = (attachment) => resolveFileUrl(attachment.file_url)
 
   return (
     <div className="space-y-8 animate-fade-in-up">
@@ -169,7 +170,7 @@ export default function InvoiceAttachments() {
             {attachments.map((attachment) => (
               <a
                 key={attachment.id}
-                href={attachment.file_url}
+                href={fileUrl(attachment)}
                 target="_blank"
                 rel="noreferrer"
                 className="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-lg"
@@ -177,7 +178,7 @@ export default function InvoiceAttachments() {
                 <div className="flex aspect-video items-center justify-center overflow-hidden bg-slate-100">
                   {attachment.is_image ? (
                     <img
-                      src={attachment.file_url}
+                      src={fileUrl(attachment)}
                       alt={attachment.original_name || 'Uploaded invoice'}
                       loading="lazy"
                       decoding="async"
@@ -227,6 +228,19 @@ export default function InvoiceAttachments() {
       </section>
     </div>
   )
+}
+
+function resolveFileUrl(url) {
+  if (!url) return '#'
+  if (/^https?:\/\//i.test(url)) return url
+
+  const baseUrl = api.defaults.baseURL || ''
+
+  if (url.startsWith('/api') && baseUrl.startsWith('http')) {
+    return `${baseUrl.replace(/\/api\/?$/, '')}${url}`
+  }
+
+  return url
 }
 
 function getAttachments(data) {

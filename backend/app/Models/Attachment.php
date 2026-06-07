@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Attachment extends Model
 {
@@ -28,7 +27,7 @@ class Attachment extends Model
 
     public function getFileUrlAttribute(): string
     {
-        return url(Storage::disk('public')->url($this->file_path));
+        return '/api/attachments/'.$this->id.'/file';
     }
 
     public function getOriginalNameAttribute(): ?string

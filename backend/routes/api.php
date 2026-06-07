@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\AttachmentController;
 
 Route::get('/health', fn () => ['status' => 'ok', 'app' => 'Koryaal']);
 
@@ -18,6 +19,7 @@ Route::post('/forgot-password', [ForgotPasswordController::class, 'forgotPasswor
 Route::post('/verify-reset-code', [ForgotPasswordController::class, 'verifyResetCode']);
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 Route::post('/register-company', [AuthController::class, 'registerCompany']);
+Route::get('/attachments/{attachment}/file', [AttachmentController::class, 'file']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::patch('/me', [AuthController::class, 'updateProfile']);
@@ -35,6 +37,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/summary', [DashboardController::class, 'summary']);
     Route::get('/reports/monthly', [DailyReportController::class, 'monthly']);
 });
-
-
 
