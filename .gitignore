@@ -1,0 +1,26 @@
+# BuildTrack AI local/dependency files
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Backend
+backend/.env
+backend/.phpunit.cache/
+backend/bootstrap/cache/*.php
+backend/storage/logs/*.log
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/vendor/
+
+# Local databases
+backend/database/*.sqlite
+
