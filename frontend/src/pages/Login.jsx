@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { Building2, KeyRound, Lock, Mail, LogIn, Phone, ShieldCheck } from 'lucide-react'
 import api from '../services/api'
 
 export default function Login({ onLogin }) {
   const [mode, setMode] = useState('login')
+
   const [form, setForm] = useState({
     company_name: '',
     company_email: '',
@@ -16,6 +16,7 @@ export default function Login({ onLogin }) {
     password_confirmation: '',
     code: '',
   })
+
   const [loading, setLoading] = useState(false)
   const [notice, setNotice] = useState(null)
 
@@ -24,9 +25,27 @@ export default function Login({ onLogin }) {
     setForm((previous) => ({ ...previous, [name]: value }))
   }
 
+  const getErrorMessage = (error, fallback) => {
+    const apiMessage = error?.response?.data?.message
+    const validationErrors = error?.response?.data?.errors
+
+    if (apiMessage) return apiMessage
+
+    if (validationErrors) {
+      return Object.values(validationErrors).flat().join(' ')
+    }
+
+    if (error?.message === 'Network Error') {
+      return 'Network error. Check backend server, CORS, or internet connection.'
+    }
+
+    return fallback
+  }
+
   const changeMode = (nextMode) => {
     setMode(nextMode)
     setNotice(null)
+
     setForm((previous) => ({
       ...previous,
       password: '',
@@ -42,17 +61,20 @@ export default function Login({ onLogin }) {
 
     try {
       const { data } = await api.post('/login', {
-        email: form.email,
+        email: form.email.trim(),
         password: form.password,
       })
+
       onLogin(data)
     } catch (error) {
       console.error(error)
+
       setNotice({
         type: 'warning',
-        text:
-          error?.response?.data?.message ||
-          'Could not log in. Check your email, password, and backend server.',
+        text: getErrorMessage(
+          error,
+          'Could not log in. Check your email, password, and backend server.'
+        ),
       })
     } finally {
       setLoading(false)
@@ -65,26 +87,33 @@ export default function Login({ onLogin }) {
     setNotice(null)
 
     try {
-      const { data } = await api.post('/forgot-password', { email: form.email })
+      const { data } = await api.post('/forgot-password', {
+        email: form.email.trim(),
+      })
+
       setNotice({
         type: 'success',
         text: data.local_reset_code
           ? `${data.message} Code: ${data.local_reset_code}`
-          : (data.message || 'Reset code sent. Check your email inbox.'),
+          : data.message || 'Reset code sent. Check your email inbox.',
       })
+
       setMode('verify')
     } catch (error) {
       console.error(error)
+
       setNotice({
         type: 'warning',
-        text:
-          error?.response?.data?.message ||
-          'Could not send reset code. Check your email and mail settings.',
+        text: getErrorMessage(
+          error,
+          'Could not send reset code. Check your email and mail settings.'
+        ),
       })
     } finally {
       setLoading(false)
     }
   }
+
   const submitVerifyCode = async (event) => {
     event.preventDefault()
     setLoading(true)
@@ -92,21 +121,22 @@ export default function Login({ onLogin }) {
 
     try {
       const { data } = await api.post('/verify-reset-code', {
-        email: form.email,
-        code: form.code,
+        email: form.email.trim(),
+        code: form.code.trim(),
       })
+
       setNotice({
         type: 'success',
         text: data.message || 'Code verified. You can now create a new password.',
       })
+
       setMode('reset')
     } catch (error) {
       console.error(error)
+
       setNotice({
         type: 'warning',
-        text:
-          error?.response?.data?.message ||
-          'Invalid or expired reset code.',
+        text: getErrorMessage(error, 'Invalid or expired reset code.'),
       })
     } finally {
       setLoading(false)
@@ -118,18 +148,39 @@ export default function Login({ onLogin }) {
     setLoading(true)
     setNotice(null)
 
+    if (form.password.length < 8) {
+      setNotice({
+        type: 'warning',
+        text: 'Password must be at least 8 characters.',
+      })
+      setLoading(false)
+      return
+    }
+
+    if (form.password !== form.password_confirmation) {
+      setNotice({
+        type: 'warning',
+        text: 'Password confirmation must match the new password.',
+      })
+      setLoading(false)
+      return
+    }
+
     try {
       const { data } = await api.post('/reset-password', {
-        email: form.email,
-        code: form.code,
+        email: form.email.trim(),
+        code: form.code.trim(),
         password: form.password,
         password_confirmation: form.password_confirmation,
       })
+
       setNotice({
         type: 'success',
         text: data.message || 'Password updated. Please sign in with your new password.',
       })
+
       setMode('login')
+
       setForm((previous) => ({
         ...previous,
         password: '',
@@ -138,11 +189,13 @@ export default function Login({ onLogin }) {
       }))
     } catch (error) {
       console.error(error)
+
       setNotice({
         type: 'warning',
-        text:
-          error?.response?.data?.message ||
-          'Could not reset password. Check the code and password confirmation.',
+        text: getErrorMessage(
+          error,
+          'Could not reset password. Check the code and password confirmation.'
+        ),
       })
     } finally {
       setLoading(false)
@@ -154,16 +207,71 @@ export default function Login({ onLogin }) {
     setLoading(true)
     setNotice(null)
 
+    if (!form.company_name.trim()) {
+      setNotice({ type: 'warning', text: 'Company name is required.' })
+      setLoading(false)
+      return
+    }
+
+    if (!form.company_email.trim()) {
+      setNotice({ type: 'warning', text: 'Company email is required.' })
+      setLoading(false)
+      return
+    }
+
+    if (!form.name.trim()) {
+      setNotice({ type: 'warning', text: 'Admin name is required.' })
+      setLoading(false)
+      return
+    }
+
+    if (!form.email.trim()) {
+      setNotice({ type: 'warning', text: 'Admin email is required.' })
+      setLoading(false)
+      return
+    }
+
+    if (form.password.length < 8) {
+      setNotice({
+        type: 'warning',
+        text: 'Password must be at least 8 characters.',
+      })
+      setLoading(false)
+      return
+    }
+
+    if (form.password !== form.password_confirmation) {
+      setNotice({
+        type: 'warning',
+        text: 'Confirm password must match password.',
+      })
+      setLoading(false)
+      return
+    }
+
+    const payload = {
+      company_name: form.company_name.trim(),
+      company_email: form.company_email.trim(),
+      company_phone: form.company_phone.trim(),
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      password: form.password,
+      password_confirmation: form.password_confirmation,
+    }
+
     try {
-      const { data } = await api.post('/register-company', form)
+      const { data } = await api.post('/register-company', payload)
       onLogin(data)
     } catch (error) {
       console.error(error)
+
       setNotice({
         type: 'warning',
-        text:
-          error?.response?.data?.message ||
-          'Could not create company. Check required fields and password length.',
+        text: getErrorMessage(
+          error,
+          'Could not create company. Check required fields and password length.'
+        ),
       })
     } finally {
       setLoading(false)
@@ -191,11 +299,13 @@ export default function Login({ onLogin }) {
       <div className="grid w-full max-w-5xl overflow-hidden rounded-[2rem] bg-white shadow-[0_20px_70px_-30px_rgba(15,23,42,0.55)] lg:grid-cols-[1.05fr_0.95fr]">
         <section className="relative hidden overflow-hidden bg-slate-950 p-10 text-white lg:block">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.20),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.14),_transparent_38%)]" />
+
           <div className="relative flex h-full flex-col justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#12b8d2] text-[#06101f] shadow-lg shadow-cyan-500/20">
                 <Building2 size={24} />
               </div>
+
               <div>
                 <h1 className="text-2xl font-black text-[#41dff2]">Koryaal</h1>
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-slate-300">
@@ -209,11 +319,14 @@ export default function Login({ onLogin }) {
                 <ShieldCheck size={14} />
                 Secure team access
               </div>
+
               <h2 className="max-w-md text-4xl font-black leading-tight tracking-tight">
                 Sign in or create a company workspace for your own team.
               </h2>
+
               <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-300">
-                Role-based access starts here. Admins can manage the workspace while engineers, finance teams, and clients see their assigned work.
+                Role-based access starts here. Admins can manage the workspace while engineers,
+                finance teams, and clients see their assigned work.
               </p>
             </div>
           </div>
@@ -225,6 +338,7 @@ export default function Login({ onLogin }) {
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-500 text-white">
                 <Building2 size={22} />
               </div>
+
               <div>
                 <h1 className="text-xl font-black text-slate-950">Koryaal</h1>
                 <p className="text-xs font-semibold text-slate-500">Construction management</p>
@@ -238,7 +352,13 @@ export default function Login({ onLogin }) {
           </div>
 
           {notice && (
-            <div className={`mt-6 rounded-2xl p-4 text-sm font-extrabold ring-1 ring-inset ${notice.type === 'success' ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/10' : 'bg-amber-50 text-amber-700 ring-amber-600/10'}`}>
+            <div
+              className={`mt-6 rounded-2xl p-4 text-sm font-extrabold ring-1 ring-inset ${
+                notice.type === 'success'
+                  ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/10'
+                  : 'bg-amber-50 text-amber-700 ring-amber-600/10'
+              }`}
+            >
               {notice.text}
             </div>
           )}
@@ -254,6 +374,7 @@ export default function Login({ onLogin }) {
                   onChange={handleChange}
                   placeholder="admin@company.com"
                   autoComplete="email"
+                  required
                 />
               </Field>
 
@@ -266,6 +387,7 @@ export default function Login({ onLogin }) {
                   onChange={handleChange}
                   placeholder="Enter password"
                   autoComplete="current-password"
+                  required
                 />
               </Field>
 
@@ -274,11 +396,19 @@ export default function Login({ onLogin }) {
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
 
-              <Link to="/forgot-password" className="block w-full text-center text-sm font-black text-cyan-700 hover:underline">
+              <button
+                type="button"
+                onClick={() => changeMode('forgot')}
+                className="block w-full text-center text-sm font-black text-cyan-700 hover:underline"
+              >
                 Forgot password?
-              </Link>
+              </button>
 
-              <button type="button" onClick={() => changeMode('register')} className="btn btn-light w-full">
+              <button
+                type="button"
+                onClick={() => changeMode('register')}
+                className="btn btn-light w-full"
+              >
                 Create New Company
               </button>
             </form>
@@ -295,6 +425,7 @@ export default function Login({ onLogin }) {
                   onChange={handleChange}
                   placeholder="admin@company.com"
                   autoComplete="email"
+                  required
                 />
               </Field>
 
@@ -320,6 +451,7 @@ export default function Login({ onLogin }) {
                   onChange={handleChange}
                   placeholder="admin@company.com"
                   autoComplete="email"
+                  required
                 />
               </Field>
 
@@ -332,6 +464,7 @@ export default function Login({ onLogin }) {
                   placeholder="000000"
                   inputMode="numeric"
                   maxLength={6}
+                  required
                 />
               </Field>
 
@@ -357,6 +490,7 @@ export default function Login({ onLogin }) {
                   onChange={handleChange}
                   placeholder="Minimum 8 characters"
                   autoComplete="new-password"
+                  required
                 />
               </Field>
 
@@ -369,6 +503,7 @@ export default function Login({ onLogin }) {
                   onChange={handleChange}
                   placeholder="Repeat new password"
                   autoComplete="new-password"
+                  required
                 />
               </Field>
 
@@ -392,6 +527,7 @@ export default function Login({ onLogin }) {
                   value={form.company_name}
                   onChange={handleChange}
                   placeholder="e.g. Hodan Construction"
+                  required
                 />
               </Field>
 
@@ -404,6 +540,7 @@ export default function Login({ onLogin }) {
                     value={form.company_email}
                     onChange={handleChange}
                     placeholder="office@company.com"
+                    required
                   />
                 </Field>
 
@@ -425,6 +562,7 @@ export default function Login({ onLogin }) {
                   value={form.name}
                   onChange={handleChange}
                   placeholder="Admin / Owner full name"
+                  required
                 />
               </Field>
 
@@ -437,6 +575,7 @@ export default function Login({ onLogin }) {
                     value={form.email}
                     onChange={handleChange}
                     placeholder="admin@company.com"
+                    required
                   />
                 </Field>
 
@@ -460,6 +599,20 @@ export default function Login({ onLogin }) {
                   onChange={handleChange}
                   placeholder="Minimum 8 characters"
                   autoComplete="new-password"
+                  required
+                />
+              </Field>
+
+              <Field label="Confirm Password" icon={Lock}>
+                <input
+                  name="password_confirmation"
+                  type="password"
+                  className="input"
+                  value={form.password_confirmation}
+                  onChange={handleChange}
+                  placeholder="Repeat password"
+                  autoComplete="new-password"
+                  required
                 />
               </Field>
 
@@ -490,8 +643,3 @@ function Field({ label, icon: Icon, children }) {
     </div>
   )
 }
-
-
-
-
-
