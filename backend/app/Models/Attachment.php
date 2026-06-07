@@ -9,6 +9,10 @@ class Attachment extends Model
 {
     use HasFactory;
 
+    protected $hidden = [
+        'file_data',
+    ];
+
     protected $fillable = [
         'daily_report_id',
         'transaction_id',
