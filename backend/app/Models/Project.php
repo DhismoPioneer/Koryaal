@@ -28,6 +28,8 @@ class Project extends Model
 
     protected $appends = [
         'spent_amount',
+        'income_amount',
+        'cash_balance',
         'remaining_budget',
         'budget_status',
     ];
@@ -61,9 +63,29 @@ class Project extends Model
 
     public function getSpentAmountAttribute()
     {
+        if (array_key_exists('spent_amount_sum', $this->attributes)) {
+            return (float) $this->attributes['spent_amount_sum'];
+        }
+
         return (float) $this->transactions()
             ->where('type', 'expense')
             ->sum('amount');
+    }
+
+    public function getIncomeAmountAttribute()
+    {
+        if (array_key_exists('income_amount_sum', $this->attributes)) {
+            return (float) $this->attributes['income_amount_sum'];
+        }
+
+        return (float) $this->transactions()
+            ->where('type', 'income')
+            ->sum('amount');
+    }
+
+    public function getCashBalanceAttribute()
+    {
+        return $this->income_amount - $this->spent_amount;
     }
 
     public function getRemainingBudgetAttribute()
@@ -88,4 +110,3 @@ class Project extends Model
         return 'within_budget';
     }
 }
-

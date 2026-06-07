@@ -13,7 +13,9 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         return $this->visibleProjects($request)
-            ->with(['client', 'transactions'])
+            ->with('client')
+            ->withSum(['transactions as spent_amount_sum' => fn ($query) => $query->where('type', 'expense')], 'amount')
+            ->withSum(['transactions as income_amount_sum' => fn ($query) => $query->where('type', 'income')], 'amount')
             ->latest()
             ->get();
     }
@@ -55,7 +57,7 @@ class ProjectController extends Controller
         ]);
 
         return response()->json(
-            $project->load(['client', 'transactions']),
+            $project->load('client'),
             201
         );
     }
@@ -110,7 +112,7 @@ class ProjectController extends Controller
 
         $project->update($validated);
 
-        return $project->load(['client', 'transactions']);
+        return $project->load('client');
     }
 
     public function destroy(Request $request, Project $project)
@@ -176,3 +178,4 @@ class ProjectController extends Controller
         );
     }
 }
+

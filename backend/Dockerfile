@@ -20,4 +20,4 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN chmod -R 775 storage bootstrap/cache
 
-CMD sh -c "php artisan migrate --force && php artisan config:clear && php artisan route:clear && php artisan cache:clear && php artisan config:cache && php -S 0.0.0.0:${PORT} -t public"
+CMD sh -c "php artisan storage:link || true && php artisan migrate --force && php artisan config:clear && php artisan route:clear && php artisan cache:clear && php artisan config:cache && php -S 0.0.0.0:${PORT} -t public"

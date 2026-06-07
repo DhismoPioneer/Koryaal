@@ -38,6 +38,7 @@ class Attachment extends Model
 
     public function getIsImageAttribute(): bool
     {
-        return in_array($this->file_type, ['receipt', 'photo', 'payment_proof'], true);
+        return in_array($this->file_type, ['image', 'receipt', 'photo', 'payment_proof'], true);
     }
 }
+

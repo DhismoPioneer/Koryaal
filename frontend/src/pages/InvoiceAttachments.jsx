@@ -179,6 +179,12 @@ export default function InvoiceAttachments() {
                     <img
                       src={attachment.file_url}
                       alt={attachment.original_name || 'Uploaded invoice'}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(event) => {
+                        event.currentTarget.style.display = 'none'
+                        event.currentTarget.parentElement?.classList.add('bg-amber-50')
+                      }}
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
                   ) : (
@@ -252,3 +258,4 @@ function formatDate(dateValue) {
   if (mIdx < 0 || mIdx > 11) return cleanStr
   return `${months[mIdx]} ${parseInt(day, 10)}, ${year}`
 }
+
