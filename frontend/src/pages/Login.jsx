@@ -36,7 +36,7 @@ export default function Login({ onLogin }) {
     }
 
     if (error?.message === 'Network Error') {
-      return 'Network error. Check backend server, CORS, or internet connection.'
+      return `Network error. The frontend is trying to reach ${api.defaults.baseURL}. Check VITE_API_BASE_URL, backend server, and CORS settings.`
     }
 
     return fallback
