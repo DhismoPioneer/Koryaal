@@ -16,7 +16,7 @@ This starter includes:
 matoor = 35
 Matoor 8
 15 farsamo yaqaan pom
-Total = 158
+
 ```
 
 ---
@@ -78,7 +78,7 @@ Then go to **Add WhatsApp Report**, paste this sample, and click **Extract Previ
 matoor = 35
 Matoor 8
 15 farsamo yaqaan pom
-Total = 158
+
 ```
 
 You should see extracted rows, calculated total, provided total, difference, and review status.
