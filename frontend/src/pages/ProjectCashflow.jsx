@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { BadgeDollarSign, CalendarDays, Compass, CreditCard, RefreshCcw, Save, Upload, Wallet } from 'lucide-react'
+import { BadgeDollarSign, CalendarDays, Compass, CreditCard, FileSpreadsheet, RefreshCcw, Save, Search, Upload, Wallet } from 'lucide-react'
+import * as XLSX from 'xlsx'
+import { saveAs } from 'file-saver'
 import api from '../services/api'
 
 const paymentMethods = ['Not Provided', 'EVC Plus', 'E-Dahab', 'Bank', 'Cash', 'Other']
@@ -17,6 +19,9 @@ export default function ProjectCashflow() {
   const [attachments, setAttachments] = useState([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [historyMonth, setHistoryMonth] = useState(new Date().toISOString().slice(0, 7))
+  const [historyData, setHistoryData] = useState(null)
+  const [historyLoading, setHistoryLoading] = useState(false)
   const [notice, setNotice] = useState(null)
 
   useEffect(() => {
@@ -41,11 +46,158 @@ export default function ProjectCashflow() {
   const isWithdraw = movementType === 'withdraw'
   const numericAmount = Number(amount || 0)
 
+  const cashflowRows = useMemo(() => {
+    return (historyData?.reports || []).flatMap((report) =>
+      (report.transactions || [])
+        .filter((transaction) => ['deposit', 'withdrawal'].includes(String(transaction.category || '').toLowerCase()))
+        .map((transaction) => ({
+          reportId: report.id,
+          date: report.report_date,
+          projectName: report.project?.project_name || selectedProject?.project_name || '',
+          movement: transaction.category === 'withdrawal' || transaction.type === 'expense' ? 'Withdrawal' : 'Deposit',
+          description: transaction.description || '',
+          amount: Number(transaction.amount || 0),
+          paymentMethod: transaction.payment_method || report.payment_method || 'Not Provided',
+          reference: transaction.payment_reference || '',
+          person: transaction.paid_to || transaction.paid_by || '',
+          review: transaction.needs_review ? 'Check' : 'OK',
+        }))
+    )
+  }, [historyData, selectedProject])
+
   const previewBalance = useMemo(() => {
     if (!selectedProject) return 0
     const current = Number(selectedProject.cash_balance || 0)
     return isWithdraw ? current - numericAmount : current + numericAmount
   }, [selectedProject, isWithdraw, numericAmount])
+
+  const historyTotals = useMemo(() => {
+    return cashflowRows.reduce((summary, row) => {
+      if (row.movement === 'Deposit') {
+        summary.deposits += row.amount
+      } else {
+        summary.withdrawals += row.amount
+      }
+
+      return summary
+    }, { deposits: 0, withdrawals: 0 })
+  }, [cashflowRows])
+
+  useEffect(() => {
+    setHistoryData(null)
+
+    if (projectId) {
+      loadHistory(projectId, historyMonth)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, historyMonth])
+
+  const loadHistory = async (selectedProjectId = projectId, selectedMonth = historyMonth) => {
+    if (!selectedProjectId) {
+      setNotice({ type: 'warning', text: 'Please select a project first before viewing deposit/withdraw history.' })
+      return
+    }
+
+    setHistoryLoading(true)
+    setNotice(null)
+
+    try {
+      const { data } = await api.get('/reports/monthly', {
+        params: {
+          project_id: selectedProjectId,
+          month: selectedMonth,
+        },
+      })
+
+      setHistoryData(data)
+
+      const movementCount = (data?.reports || []).reduce((count, report) => {
+        return count + (report.transactions || []).filter((transaction) =>
+          ['deposit', 'withdrawal'].includes(String(transaction.category || '').toLowerCase())
+        ).length
+      }, 0)
+
+      if (movementCount === 0) {
+        setNotice({ type: 'warning', text: 'No deposit/withdraw history found for this project and month.' })
+      }
+    } catch (error) {
+      console.error(error)
+      setHistoryData(null)
+      setNotice({ type: 'warning', text: 'Could not load deposit/withdraw history. Make sure the backend is running.' })
+    } finally {
+      setHistoryLoading(false)
+    }
+  }
+
+  const exportHistory = () => {
+    if (!projectId) {
+      setNotice({ type: 'warning', text: 'Please select a project first before exporting history.' })
+      return
+    }
+
+    if (cashflowRows.length === 0) {
+      setNotice({ type: 'warning', text: 'No deposit/withdraw history available to export.' })
+      return
+    }
+
+    const rows = cashflowRows.map((row) => ({
+      'Project Name': row.projectName,
+      Movement: row.movement,
+      Description: row.description,
+      Amount: row.amount,
+      Payment: row.paymentMethod,
+      Reference: row.reference,
+      Person: row.person,
+      Review: row.review,
+      Date: formatDate(row.date),
+      'Report ID': row.reportId,
+    }))
+
+    const workbook = XLSX.utils.book_new()
+    const worksheet = XLSX.utils.json_to_sheet(rows, {
+      header: [
+        'Project Name',
+        'Movement',
+        'Description',
+        'Amount',
+        'Payment',
+        'Reference',
+        'Person',
+        'Review',
+        'Date',
+        'Report ID',
+      ],
+    })
+
+    worksheet['!cols'] = [
+      { wch: 28 },
+      { wch: 14 },
+      { wch: 30 },
+      { wch: 14 },
+      { wch: 16 },
+      { wch: 20 },
+      { wch: 22 },
+      { wch: 12 },
+      { wch: 14 },
+      { wch: 10 },
+    ]
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Cashflow History')
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    })
+
+    const file = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+
+    const safeProjectName = (selectedProject?.project_name || 'project').replace(/[^a-z0-9]/gi, '_').toLowerCase()
+
+    saveAs(file, `deposit_withdraw_history_${safeProjectName}_${historyMonth}.xlsx`)
+    setNotice({ type: 'success', text: 'Deposit/withdraw history exported successfully.' })
+  }
 
   const saveMovement = async () => {
     setSaving(true)
@@ -116,6 +268,7 @@ export default function ProjectCashflow() {
       setDescription('')
       setAttachments([])
       await loadProjects()
+      await loadHistory(projectId, historyMonth)
     } catch (error) {
       console.error(error)
       setNotice({ type: 'warning', text: error?.response?.data?.message || 'Could not save deposit/withdraw entry.' })
@@ -223,6 +376,88 @@ export default function ProjectCashflow() {
           <Metric label="After This Entry" value={previewBalance} color={previewBalance < 0 ? 'text-rose-700' : 'text-slate-950'} />
         </div>
       </section>
+
+      <section className="card overflow-hidden">
+        <div className="border-b border-slate-100 bg-slate-50/50 p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h3 className="text-xl font-extrabold text-slate-900">Deposit / Withdraw History</h3>
+              <p className="mt-1 text-xs font-semibold text-slate-400">
+                Track saved project cash movements by month and export them for finance review.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-[180px_1fr_1fr]">
+              <Field label="History Month" icon={CalendarDays}>
+                <input className="input" type="month" value={historyMonth} onChange={(event) => setHistoryMonth(event.target.value)} />
+              </Field>
+              <div className="flex items-end">
+                <button type="button" onClick={() => loadHistory()} disabled={historyLoading} className="btn btn-light w-full">
+                  {historyLoading ? <RefreshCcw size={17} className="animate-spin" /> : <Search size={17} />}
+                  {historyLoading ? 'Loading...' : 'View History'}
+                </button>
+              </div>
+              <div className="flex items-end">
+                <button type="button" onClick={exportHistory} className="btn btn-primary w-full">
+                  <FileSpreadsheet size={17} />
+                  Export
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <MiniMetric label="History Deposits" value={historyTotals.deposits} color="text-emerald-700" />
+            <MiniMetric label="History Withdrawals" value={historyTotals.withdrawals} color="text-rose-700" />
+            <MiniMetric label="Net Movement" value={historyTotals.deposits - historyTotals.withdrawals} color={historyTotals.deposits - historyTotals.withdrawals < 0 ? 'text-rose-700' : 'text-cyan-700'} />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[960px] text-sm">
+            <thead className="border-b border-slate-100 bg-slate-50 font-extrabold text-slate-500">
+              <tr>
+                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Date</th>
+                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Movement</th>
+                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Description</th>
+                <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">Amount</th>
+                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Payment</th>
+                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Person</th>
+                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Reference</th>
+                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Report</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {cashflowRows.map((row) => (
+                <tr key={`${row.reportId}-${row.movement}-${row.description}-${row.amount}`} className="transition hover:bg-slate-50/30">
+                  <td className="p-4 text-xs font-semibold text-slate-400">{formatDate(row.date)}</td>
+                  <td className="p-4">
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-black ring-1 ring-inset ${row.movement === 'Deposit' ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/10' : 'bg-rose-50 text-rose-700 ring-rose-600/10'}`}>
+                      {row.movement}
+                    </span>
+                  </td>
+                  <td className="p-4 font-extrabold text-slate-900">{row.description}</td>
+                  <td className={`p-4 text-right font-black ${row.movement === 'Deposit' ? 'text-emerald-700' : 'text-rose-700'}`}>
+                    ${row.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </td>
+                  <td className="p-4 text-xs font-semibold text-slate-500">{row.paymentMethod}</td>
+                  <td className="p-4 text-xs font-semibold text-slate-500">{row.person || '-'}</td>
+                  <td className="p-4 text-xs font-semibold text-slate-500">{row.reference || '-'}</td>
+                  <td className="p-4 text-xs font-black text-slate-400">#{row.reportId}</td>
+                </tr>
+              ))}
+
+              {cashflowRows.length === 0 && (
+                <tr>
+                  <td colSpan="8" className="p-12 text-center font-bold text-slate-400">
+                    {projectId ? 'No deposit/withdraw history found for this month.' : 'Select a project to view deposit/withdraw history.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   )
 }
@@ -246,4 +481,36 @@ function Metric({ label, value, color }) {
       <p className={`mt-2 text-2xl font-black ${color}`}>${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
     </div>
   )
+}
+
+function MiniMetric({ label, value, color }) {
+  return (
+    <div className="rounded-2xl border border-slate-100 bg-white p-4">
+      <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">{label}</p>
+      <p className={`mt-2 text-lg font-black ${color}`}>${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+    </div>
+  )
+}
+
+function formatDate(dateValue) {
+  if (!dateValue) return 'N/A'
+
+  const cleanStr = String(dateValue).slice(0, 10)
+  const parts = cleanStr.split('-')
+
+  if (parts.length === 3) {
+    const [year, month, day] = parts
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ]
+
+    const mIdx = parseInt(month, 10) - 1
+
+    if (mIdx >= 0 && mIdx < 12) {
+      return `${months[mIdx]} ${parseInt(day, 10)}, ${year}`
+    }
+  }
+
+  return cleanStr
 }
