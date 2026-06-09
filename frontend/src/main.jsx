@@ -258,7 +258,9 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                     }`}
                   >
                     <span className="flex items-center gap-4">
-                      <Icon size={20} />
+                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition ${isMenuActive ? 'bg-[#12b8d2] text-[#04111f]' : 'bg-white/5 text-[#4de7ff]'}`}>
+                        <Icon size={18} />
+                      </span>
                       {item.label}
                     </span>
                     <ChevronDown size={15} className={`transition ${isMenuActive ? 'text-[#4de7ff]' : 'text-slate-500'} ${isOpen ? 'rotate-180' : ''}`} />
@@ -287,7 +289,9 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                                 {isActive && (
                                   <span className="absolute -left-[13px] top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-[#12b8d2]" />
                                 )}
-                                <ChildIcon size={16} />
+                                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${isActive ? 'bg-[#04111f]/10 text-[#04111f]' : 'bg-white/5 text-[#4de7ff]'}`}>
+                                  <ChildIcon size={14} />
+                                </span>
                                 <span className="truncate">{child.label}</span>
                               </>
                             )}
@@ -319,7 +323,9 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                     {isActive && (
                       <span className="absolute left-0 top-3 h-8 w-1 rounded-full bg-[#13c7e0]" />
                     )}
-                    <Icon size={20} />
+                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isActive ? 'bg-[#12b8d2] text-[#04111f]' : 'bg-white/5 text-[#4de7ff]'}`}>
+                      <Icon size={18} />
+                    </span>
                     {item.label}
                   </>
                 )}
@@ -336,7 +342,9 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
               to="/how-to-use"
               className="flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-extrabold text-slate-300 hover:bg-white/5 hover:text-white"
             >
-              <HelpCircle size={19} />
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-[#4de7ff]">
+                <HelpCircle size={17} />
+              </span>
               Support
             </Link>
 
@@ -345,7 +353,9 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
               onClick={logout}
               className="mt-1 flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-extrabold text-slate-300 hover:bg-white/5 hover:text-white"
             >
-              <LogOut size={19} />
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-[#4de7ff]">
+                <LogOut size={17} />
+              </span>
               Logout
             </button>
           </div>
@@ -384,10 +394,11 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                   end
                   className={({ isActive }) =>
                     isActive
-                      ? 'border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                      : 'py-6 text-slate-500 hover:text-slate-900'
+                      ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
+                      : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
                   }
                 >
+                  <LayoutDashboard size={16} />
                   Overview
                 </NavLink>
 
@@ -396,10 +407,11 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                   to="/add-report"
                   className={({ isActive }) =>
                     isActive
-                      ? 'border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                      : 'py-6 text-slate-500 hover:text-slate-900'
+                      ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
+                      : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
                   }
                 >
+                  <Wallet size={16} />
                   WhatsApp Report
                 </NavLink>
                 )}
@@ -409,10 +421,11 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                   to="/users"
                   className={({ isActive }) =>
                     isActive
-                      ? 'border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                      : 'py-6 text-slate-500 hover:text-slate-900'
+                      ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
+                      : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
                   }
                 >
+                  <Users size={16} />
                   Users
                 </NavLink>
                 )}
@@ -423,30 +436,33 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                     to="/manual-report"
                     className={({ isActive }) =>
                       isActive
-                        ? 'border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                        : 'py-6 text-slate-500 hover:text-slate-900'
+                        ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
+                        : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
                     }
                   >
+                    <FileText size={16} />
                     Manual Entry
                   </NavLink>
                   <NavLink
                     to="/reports"
                     className={({ isActive }) =>
                       isActive
-                        ? 'border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                        : 'py-6 text-slate-500 hover:text-slate-900'
+                        ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
+                        : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
                     }
                   >
+                    <ClipboardList size={16} />
                     Reports
                   </NavLink>
                   <NavLink
                     to="/invoices"
                     className={({ isActive }) =>
                       isActive
-                        ? 'border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                        : 'py-6 text-slate-500 hover:text-slate-900'
+                        ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
+                        : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
                     }
                   >
+                    <Paperclip size={16} />
                     Invoices
                   </NavLink>
                 </>

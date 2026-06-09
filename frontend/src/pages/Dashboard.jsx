@@ -14,6 +14,8 @@ import {
   AlertTriangle,
   Activity,
   Building2,
+  LayoutDashboard,
+  ShieldCheck,
   Wifi,
   WifiOff,
 } from 'lucide-react'
@@ -533,9 +535,15 @@ export default function Dashboard({ authUser }) {
       <section className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-black tracking-tight text-slate-900">
-              Overview Dashboard
-            </h2>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-600/10">
+              <LayoutDashboard size={24} />
+            </div>
+
+            <div className="min-w-0">
+              <h2 className="text-3xl font-black tracking-tight text-slate-900">
+                Overview Dashboard
+              </h2>
+            </div>
 
             {isOffline ? (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-black text-amber-700 ring-1 ring-inset ring-amber-600/10">
@@ -634,15 +642,23 @@ export default function Dashboard({ authUser }) {
         </div>
 
         <div className="card p-6">
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
-            Access Role
-          </p>
-          <p className="mt-2 text-2xl font-black capitalize text-slate-950">
-            {userRole}
-          </p>
-          <p className="mt-2 text-xs font-semibold text-slate-500">
-            Your dashboard data is private to this company workspace.
-          </p>
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-600/10">
+              <ShieldCheck size={23} />
+            </div>
+
+            <div>
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
+                Access Role
+              </p>
+              <p className="mt-2 text-2xl font-black capitalize text-slate-950">
+                {userRole}
+              </p>
+              <p className="mt-2 text-xs font-semibold text-slate-500">
+                Your dashboard data is private to this company workspace.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
