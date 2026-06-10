@@ -60,20 +60,55 @@ const defaultPermissionsByRole = {
   client: ['projects.view', 'client.progress.view'],
 }
 
+const IDLE_TIMEOUT_MS = 5 * 60 * 1000
+const TOKEN_STORAGE_KEY = 'koryaal_token'
+const USER_STORAGE_KEY = 'koryaal_user'
+const LAST_ACTIVITY_STORAGE_KEY = 'koryaal_last_activity'
+
 function App() {
   const [authUser, setAuthUser] = useState(null)
   const [checkingAuth, setCheckingAuth] = useState(true)
   const idleTimerRef = useRef(null)
 
   useEffect(() => {
-    localStorage.removeItem('koryaal_token')
-    localStorage.removeItem('koryaal_user')
+    const token = localStorage.getItem(TOKEN_STORAGE_KEY)
+    const storedUser = localStorage.getItem(USER_STORAGE_KEY)
+    const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_STORAGE_KEY))
+
+    const clearStoredSession = () => {
+      localStorage.removeItem(TOKEN_STORAGE_KEY)
+      localStorage.removeItem(USER_STORAGE_KEY)
+      localStorage.removeItem(LAST_ACTIVITY_STORAGE_KEY)
+    }
+
+    if (!token || !storedUser) {
+      clearStoredSession()
+      setCheckingAuth(false)
+      return
+    }
+
+    if (lastActivity && Date.now() - lastActivity > IDLE_TIMEOUT_MS) {
+      api.post('/logout').catch((error) => console.error(error))
+      clearStoredSession()
+      setCheckingAuth(false)
+      return
+    }
+
+    try {
+      setAuthUser(JSON.parse(storedUser))
+      localStorage.setItem(LAST_ACTIVITY_STORAGE_KEY, String(Date.now()))
+    } catch (error) {
+      console.error(error)
+      clearStoredSession()
+    }
+
     setCheckingAuth(false)
   }, [])
 
   const handleLogin = ({ token, user }) => {
-    localStorage.setItem('koryaal_token', token)
-    localStorage.setItem('koryaal_user', JSON.stringify(user))
+    localStorage.setItem(TOKEN_STORAGE_KEY, token)
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user))
+    localStorage.setItem(LAST_ACTIVITY_STORAGE_KEY, String(Date.now()))
     setAuthUser(user)
   }
 
@@ -83,8 +118,9 @@ function App() {
     } catch (error) {
       console.error(error)
     } finally {
-      localStorage.removeItem('koryaal_token')
-      localStorage.removeItem('koryaal_user')
+      localStorage.removeItem(TOKEN_STORAGE_KEY)
+      localStorage.removeItem(USER_STORAGE_KEY)
+      localStorage.removeItem(LAST_ACTIVITY_STORAGE_KEY)
       setAuthUser(null)
     }
   }
@@ -94,9 +130,10 @@ function App() {
 
     const resetIdleTimer = () => {
       window.clearTimeout(idleTimerRef.current)
+      localStorage.setItem(LAST_ACTIVITY_STORAGE_KEY, String(Date.now()))
       idleTimerRef.current = window.setTimeout(() => {
         handleLogout()
-      }, 5 * 60 * 1000)
+      }, IDLE_TIMEOUT_MS)
     }
 
     const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll']
@@ -117,7 +154,7 @@ function App() {
   }, [authUser])
 
   const handleUserUpdate = (user) => {
-    localStorage.setItem('koryaal_user', JSON.stringify(user))
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user))
     setAuthUser(user)
   }
 
