@@ -17,7 +17,6 @@ import {
   HelpCircle,
   LogOut,
   Bell,
-  Grid3X3,
   UserCircle,
   UserPlus,
   Menu,
@@ -262,25 +261,25 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
   return (
     <div className="min-h-screen bg-transparent">
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[280px] border-r border-white/10 bg-slate-950 text-white shadow-2xl shadow-slate-950/20 lg:flex lg:flex-col">
-        <div className="px-6 py-6">
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[260px] border-r border-white/10 bg-slate-950 text-white shadow-2xl shadow-slate-950/20 lg:flex lg:flex-col">
+        <div className="px-5 py-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#12b8d2] text-[#06101f] shadow-lg shadow-cyan-500/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20">
               <Building2 size={21} />
             </div>
 
             <div>
-              <h1 className="text-lg font-black leading-none text-[#41dff2]">
+              <h1 className="text-base font-black leading-none text-cyan-100">
                 BuildTrack AI
               </h1>
-              <p className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-300">
+              <p className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
                 Site Manager
               </p>
             </div>
           </div>
         </div>
 
-        <nav className="mt-4 flex-1 space-y-2 overflow-y-auto px-5 pb-4">
+        <nav className="mt-2 flex-1 space-y-1 overflow-y-auto px-3 pb-4">
           {nav.map((item) => {
             const Icon = item.icon
 
@@ -293,11 +292,11 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                   <button
                     type="button"
                     onClick={() => setOpenMenus({ [item.key]: !isOpen })}
-                    className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-extrabold transition ${
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-extrabold transition ${
                       isMenuActive ? 'text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white'
                     }`}
                   >
-                    <span className="flex items-center gap-4">
+                    <span className="flex items-center gap-3">
                       <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition ${isMenuActive ? 'bg-[#12b8d2] text-[#04111f]' : 'bg-white/5 text-[#4de7ff]'}`}>
                         <Icon size={18} />
                       </span>
@@ -307,7 +306,7 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                   </button>
 
                   {isOpen && (
-                    <div className="ml-6 space-y-1 border-l border-white/10 pl-3">
+                    <div className="ml-5 space-y-1 border-l border-white/10 pl-2">
                       {item.children.map((child) => {
                         const ChildIcon = child.icon
 
@@ -317,7 +316,7 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                             to={child.to}
                             end
                             className={({ isActive }) =>
-                              `relative flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-extrabold transition ${
+                              `relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-extrabold transition ${
                                 isActive
                                   ? 'bg-[#12b8d2] text-[#04111f] shadow-sm shadow-cyan-500/20'
                                   : 'text-slate-400 hover:bg-white/5 hover:text-white'
@@ -351,7 +350,7 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                 end={item.to === '/'}
                 onClick={() => setOpenMenus({ projects: false, financials: false, users: false })}
                 className={({ isActive }) =>
-                  `relative flex items-center gap-4 px-5 py-4 text-sm font-extrabold transition ${
+                  `relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-extrabold transition ${
                     isActive
                       ? 'bg-white/10 text-[#4de7ff]'
                       : 'text-slate-300 hover:bg-white/5 hover:text-white'
@@ -374,13 +373,11 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
           })}
         </nav>
 
-        <div className="px-6 pb-6">
-          
-
-          <div className="mt-7 border-t border-white/10 pt-6">
+        <div className="px-3 pb-5">
+          <div className="border-t border-white/10 pt-4">
             <Link
               to="/how-to-use"
-              className="flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-extrabold text-slate-300 hover:bg-white/5 hover:text-white"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-extrabold text-slate-300 hover:bg-white/5 hover:text-white"
             >
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-[#4de7ff]">
                 <HelpCircle size={17} />
@@ -391,7 +388,7 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
             <button
               type="button"
               onClick={logout}
-              className="mt-1 flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-extrabold text-slate-300 hover:bg-white/5 hover:text-white"
+              className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-extrabold text-slate-300 hover:bg-white/5 hover:text-white"
             >
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-[#4de7ff]">
                 <LogOut size={17} />
@@ -511,126 +508,29 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
         </div>
       )}
 
-      <main className="lg:ml-[280px]">
+      <main className="lg:ml-[260px]">
         {/* Desktop Topbar */}
-        <div className="sticky top-0 z-30 hidden border-b border-slate-200/70 bg-white/90 backdrop-blur lg:block">
-          <div className="flex h-[76px] items-center justify-between gap-6 overflow-x-auto px-8">
-            <div className="min-w-0">
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
-                BuildTrack AI Site Manager
-              </p>
-              <h2 className="truncate text-lg font-black text-slate-950">
-                {authUser?.company?.name || 'Company Workspace'}
-              </h2>
-            </div>
-
-            <div className="flex items-center gap-7">
-              <div className="flex items-center gap-6 text-sm font-extrabold">
-                <NavLink
-                  to="/"
-                  end
-                  className={({ isActive }) =>
-                    isActive
-                      ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                      : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
-                  }
-                >
-                  <LayoutDashboard size={16} />
-                  Overview
-                </NavLink>
-
-                {canSubmitReports && (
-                <NavLink
-                  to="/add-report"
-                  className={({ isActive }) =>
-                    isActive
-                      ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                      : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
-                  }
-                >
-                  <Wallet size={16} />
-                  WhatsApp Report
-                </NavLink>
-                )}
-
-                {canManageUsers && (
-                <NavLink
-                  to="/users"
-                  className={({ isActive }) =>
-                    isActive
-                      ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                      : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
-                  }
-                >
-                  <Users size={16} />
-                  Users
-                </NavLink>
-                )}
-
-                {canViewFinancials && (
-                <>
-                  <NavLink
-                    to="/manual-report"
-                    className={({ isActive }) =>
-                      isActive
-                        ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                        : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
-                    }
-                  >
-                    <FileText size={16} />
-                    Manual Entry
-                  </NavLink>
-                  <NavLink
-                    to="/reports"
-                    className={({ isActive }) =>
-                      isActive
-                        ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                        : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
-                    }
-                  >
-                    <ClipboardList size={16} />
-                    Reports
-                  </NavLink>
-                  <NavLink
-                    to="/invoices"
-                    className={({ isActive }) =>
-                      isActive
-                        ? 'flex items-center gap-2 border-b-2 border-[#0c7280] py-6 text-[#0c7280]'
-                        : 'flex items-center gap-2 py-6 text-slate-500 hover:text-slate-900'
-                    }
-                  >
-                    <Paperclip size={16} />
-                    Invoices
-                  </NavLink>
-                </>
-                )}
-              </div>
-
-              <div className="flex items-center gap-5 border-l border-slate-200 pl-6">
+        <div className="sticky top-0 z-30 hidden border-b border-slate-200/70 bg-white/85 shadow-sm shadow-slate-950/[0.03] backdrop-blur lg:block">
+          <div className="flex h-16 items-center justify-end px-5 xl:px-6">
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  className="text-slate-500 hover:text-slate-900"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-4 focus:ring-cyan-100"
+                  aria-label="Notifications"
                 >
                   <Bell size={20} />
-                </button>
-
-                <button
-                  type="button"
-                  className="text-slate-500 hover:text-slate-900"
-                >
-                  <Grid3X3 size={20} />
                 </button>
 
                 {canSubmitReports && (
                 <Link
                   to="/add-report"
-                  className="rounded-xl bg-[#007c8f] px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-[#006f80]"
+                  className="rounded-xl bg-cyan-700 px-4 py-2.5 text-sm font-black text-white shadow-sm transition hover:bg-cyan-600 focus:outline-none focus:ring-4 focus:ring-cyan-100"
                 >
                   WhatsApp Report
                 </Link>
                 )}
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-50 text-cyan-700 ring-4 ring-cyan-100">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-50 text-cyan-700 ring-1 ring-cyan-100">
                   {authUser?.name ? (
                     <span className="text-sm font-black">
                       {authUser.name.slice(0, 1).toUpperCase()}
@@ -639,13 +539,12 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
                     <UserCircle size={24} />
                   )}
                 </div>
-              </div>
             </div>
           </div>
         </div>
 
         {/* Page Content */}
-          <div className="mx-auto w-full max-w-[1240px] px-4 py-6 pb-32 sm:px-5 lg:px-8 lg:py-8 lg:pb-10">
+        <div className="mx-auto w-full max-w-[1280px] px-4 py-5 pb-32 sm:px-5 lg:px-5 lg:py-6 lg:pb-8 xl:px-6">
           <Routes>
             <Route path="/" element={canViewDashboard ? <Dashboard authUser={authUser} /> : <Projects authUser={authUser} />} />
             <Route path="/projects" element={hasPermission('projects.view') ? <Projects authUser={authUser} /> : <Navigate to="/settings" replace />} />
