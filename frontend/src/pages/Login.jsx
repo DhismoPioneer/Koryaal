@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Building2, KeyRound, Lock, Mail, LogIn, Phone, ShieldCheck } from 'lucide-react'
+import { Building2, CheckCircle2, KeyRound, Lock, Mail, LogIn, Phone, ShieldCheck } from 'lucide-react'
 import api from '../services/api'
 
 export default function Login({ onLogin }) {
@@ -279,81 +279,121 @@ export default function Login({ onLogin }) {
   }
 
   const title = {
-    login: 'Login',
-    register: 'Create Company',
-    forgot: 'Forgot Password',
-    verify: 'Verify Email Code',
-    reset: 'Create New Password',
+    login: 'Welcome back',
+    register: 'Create your workspace',
+    forgot: 'Reset your password',
+    verify: 'Check your email',
+    reset: 'Choose a new password',
   }[mode]
 
   const subtitle = {
-    login: 'Enter your BuildTrack AI account details.',
-    register: 'Create a company workspace and first Admin / Owner account.',
-    forgot: 'Admin, Engineer, Finance, or Client: enter your registered account email to receive a reset code.',
-    verify: 'Enter the 6-digit code sent to your registered email inbox.',
-    reset: 'Code verified. Choose a new secure password.',
+    login: 'Sign in to manage projects, reports, payments, documents, and site activity.',
+    register: 'Set up your company account and invite your team after the first login.',
+    forgot: 'Enter your account email and we will send a secure reset code.',
+    verify: 'Enter the 6-digit code sent to your registered inbox.',
+    reset: 'Create a strong password to get back into your workspace.',
+  }[mode]
+
+  const modeLabel = {
+    login: 'Sign in',
+    register: 'New company',
+    forgot: 'Password help',
+    verify: 'Verification',
+    reset: 'New password',
   }[mode]
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f4f7fb] px-4 py-10">
-      <div className="grid w-full max-w-5xl overflow-hidden rounded-[2rem] bg-white shadow-[0_20px_70px_-30px_rgba(15,23,42,0.55)] lg:grid-cols-[1.05fr_0.95fr]">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(8,145,178,0.12),_transparent_28rem),linear-gradient(135deg,#f8fafc_0%,#eef6f8_52%,#f8fafc_100%)] px-4 py-6 sm:py-10">
+      <div className="mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/80 bg-white/80 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.55)] backdrop-blur-xl lg:grid-cols-[1.02fr_0.98fr]">
         <section className="relative hidden overflow-hidden bg-slate-950 p-10 text-white lg:block">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.20),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.14),_transparent_38%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_12%,_rgba(34,211,238,0.22),_transparent_28rem),radial-gradient(circle_at_8%_86%,_rgba(37,99,235,0.18),_transparent_26rem)]" />
+          <div className="absolute inset-x-10 bottom-10 top-32 rounded-[2rem] border border-white/10 bg-white/[0.03]" />
 
           <div className="relative flex h-full flex-col justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#12b8d2] text-[#06101f] shadow-lg shadow-cyan-500/20">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20">
                 <Building2 size={24} />
               </div>
 
               <div>
-                <h1 className="text-2xl font-black text-[#41dff2]">BuildTrack AI</h1>
+                <h1 className="text-2xl font-black text-cyan-100">BuildTrack AI</h1>
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-slate-300">
-                  Construction Management
+                  Site Manager
                 </p>
               </div>
             </div>
 
-            <div>
+            <div className="max-w-md">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold text-cyan-100">
                 <ShieldCheck size={14} />
-                Secure team access
+                Secure construction workspace
               </div>
 
-              <h2 className="max-w-md text-4xl font-black leading-tight tracking-tight">
-                Sign in or create a company workspace for your own team.
+              <h2 className="text-4xl font-black leading-tight tracking-tight">
+                Run your site operations from one clear dashboard.
               </h2>
 
-              <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-300">
-                Role-based access starts here. Admins can manage the workspace while engineers,
-                finance teams, and clients see their assigned work.
+              <p className="mt-4 text-sm leading-relaxed text-slate-300">
+                Keep projects, daily reports, transactions, invoices, messages, and team access organized without changing how your backend works.
               </p>
+
+              <div className="mt-8 grid gap-3">
+                {['Project progress and budgets', 'Daily reports and finance logs', 'Role-based access for every team'].map((item) => (
+                  <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-bold text-slate-100">
+                    <CheckCircle2 size={17} className="text-cyan-300" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <AuthMetric label="Projects" value="Live" />
+              <AuthMetric label="Reports" value="Smart" />
+              <AuthMetric label="Access" value="Secure" />
             </div>
           </div>
         </section>
 
-        <section className="p-6 sm:p-10">
+        <section className="flex items-center p-5 sm:p-8 lg:p-10">
+          <div className="w-full">
           <div className="mb-8 lg:hidden">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-500 text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-600 text-white shadow-lg shadow-cyan-700/20">
                 <Building2 size={22} />
               </div>
 
               <div>
                 <h1 className="text-xl font-black text-slate-950">BuildTrack AI</h1>
-                <p className="text-xs font-semibold text-slate-500">Construction management</p>
+                <p className="text-xs font-semibold text-slate-500">Site Manager</p>
               </div>
             </div>
           </div>
 
-          <div>
-            <h2 className="text-3xl font-black text-slate-950">{title}</h2>
-            <p className="mt-2 text-sm font-semibold text-slate-500">{subtitle}</p>
+          <div className="rounded-[1.75rem] border border-slate-200/70 bg-white p-5 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.5)] sm:p-7">
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <span className="inline-flex rounded-full bg-cyan-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-700 ring-1 ring-cyan-600/10">
+                {modeLabel}
+              </span>
+              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950">{title}</h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{subtitle}</p>
+            </div>
+
+            {mode !== 'login' && (
+              <button
+                type="button"
+                onClick={() => changeMode('login')}
+                className="w-fit rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-black text-slate-600 transition hover:bg-white hover:text-slate-950"
+              >
+                Back to sign in
+              </button>
+            )}
           </div>
 
           {notice && (
             <div
-              className={`mt-6 rounded-2xl p-4 text-sm font-extrabold ring-1 ring-inset ${
+              className={`mb-6 rounded-2xl p-4 text-sm font-extrabold ring-1 ring-inset ${
                 notice.type === 'success'
                   ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/10'
                   : 'bg-amber-50 text-amber-700 ring-amber-600/10'
@@ -364,7 +404,7 @@ export default function Login({ onLogin }) {
           )}
 
           {mode === 'login' && (
-            <form onSubmit={submitLogin} className="mt-8 space-y-5">
+            <form onSubmit={submitLogin} className="space-y-5">
               <Field label="Email Address" icon={Mail}>
                 <input
                   name="email"
@@ -399,7 +439,7 @@ export default function Login({ onLogin }) {
               <button
                 type="button"
                 onClick={() => changeMode('forgot')}
-                className="block w-full text-center text-sm font-black text-cyan-700 hover:underline"
+                className="block w-full text-center text-sm font-black text-cyan-700 transition hover:text-cyan-600 hover:underline"
               >
                 Forgot password?
               </button>
@@ -407,15 +447,15 @@ export default function Login({ onLogin }) {
               <button
                 type="button"
                 onClick={() => changeMode('register')}
-                className="btn btn-light w-full"
+                className="btn btn-light w-full border-dashed"
               >
-                Create New Company
+                Create a new company workspace
               </button>
             </form>
           )}
 
           {mode === 'forgot' && (
-            <form onSubmit={submitForgotPassword} className="mt-8 space-y-5">
+            <form onSubmit={submitForgotPassword} className="space-y-5">
               <Field label="Account Email" icon={Mail}>
                 <input
                   name="email"
@@ -434,14 +474,11 @@ export default function Login({ onLogin }) {
                 {loading ? 'Sending code...' : 'Send Reset Code'}
               </button>
 
-              <button type="button" onClick={() => changeMode('login')} className="btn btn-light w-full">
-                Back to Login
-              </button>
             </form>
           )}
 
           {mode === 'verify' && (
-            <form onSubmit={submitVerifyCode} className="mt-8 space-y-5">
+            <form onSubmit={submitVerifyCode} className="space-y-5">
               <Field label="Account Email" icon={Mail}>
                 <input
                   name="email"
@@ -480,7 +517,7 @@ export default function Login({ onLogin }) {
           )}
 
           {mode === 'reset' && (
-            <form onSubmit={submitResetPassword} className="mt-8 space-y-5">
+            <form onSubmit={submitResetPassword} className="space-y-5">
               <Field label="New Password" icon={Lock}>
                 <input
                   name="password"
@@ -512,14 +549,12 @@ export default function Login({ onLogin }) {
                 {loading ? 'Updating password...' : 'Update Password'}
               </button>
 
-              <button type="button" onClick={() => changeMode('forgot')} className="btn btn-light w-full">
-                Start Again
-              </button>
+              <button type="button" onClick={() => changeMode('forgot')} className="btn btn-light w-full">Start Again</button>
             </form>
           )}
 
           {mode === 'register' && (
-            <form onSubmit={submitCompany} className="mt-8 space-y-5">
+            <form onSubmit={submitCompany} className="space-y-5">
               <Field label="Company Name" icon={Building2}>
                 <input
                   name="company_name"
@@ -621,13 +656,25 @@ export default function Login({ onLogin }) {
                 {loading ? 'Creating company...' : 'Create Company Workspace'}
               </button>
 
-              <button type="button" onClick={() => changeMode('login')} className="btn btn-light w-full">
-                Back to Login
-              </button>
             </form>
           )}
+          </div>
+
+          <p className="mt-5 text-center text-xs font-semibold text-slate-400">
+            Protected workspace access for admins, engineers, finance teams, and clients.
+          </p>
+          </div>
         </section>
       </div>
+    </div>
+  )
+}
+
+function AuthMetric({ label, value }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{label}</p>
+      <p className="mt-2 text-lg font-black text-white">{value}</p>
     </div>
   )
 }
