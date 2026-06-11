@@ -34,7 +34,7 @@ const workflowSteps = [
   },
   {
     title: '4. Financial Reports',
-    text: 'Add WhatsApp-style reports or manual finance entries. Koryaal validates calculations before saving transactions to the database.',
+    text: 'Add WhatsApp-style reports or manual finance entries. BuildTrack AI validates calculations before saving transactions to the database.',
     icon: ClipboardList,
   },
   {
@@ -92,11 +92,11 @@ export default function HowToUse() {
             </div>
 
             <h2 className="mt-5 max-w-3xl text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
-              How Koryaal Works
+              How BuildTrack AI Works
             </h2>
 
             <p className="mt-3 max-w-3xl text-sm font-semibold leading-7 text-slate-300 sm:text-base">
-              Koryaal is a company-based construction management system for projects, users, reports, transactions, invoices, and Excel reporting. Use this guide when training admins, engineers, finance teams, and clients.
+              BuildTrack AI is a company-based construction management system for projects, users, reports, transactions, invoices, and Excel reporting. Use this guide when training admins, engineers, finance teams, and clients.
             </p>
           </div>
 

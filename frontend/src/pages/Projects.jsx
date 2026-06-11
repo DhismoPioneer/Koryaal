@@ -250,7 +250,7 @@ export default function Projects({ authUser }) {
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Top Banner Header */}
-      <section className="relative overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-sm">
+      <section className="page-hero">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.18),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.12),_transparent_35%)]" />
 
         <div className="relative p-6 lg:p-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
@@ -419,7 +419,7 @@ export default function Projects({ authUser }) {
                     <option value="delayed">Delayed / Over Budget</option>
                   </select>
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-xs">
-                    ▼
+                    ?
                   </span>
                 </div>
               </Field>
@@ -486,7 +486,7 @@ export default function Projects({ authUser }) {
               ))}
             </select>
             <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-xs">
-              ▼
+              ?
             </span>
           </div>
         </div>

@@ -20,6 +20,8 @@ import {
   Grid3X3,
   UserCircle,
   UserPlus,
+  Menu,
+  X,
 } from 'lucide-react'
 
 import './index.css'
@@ -162,7 +164,7 @@ function App() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f4f7fb]">
         <div className="rounded-2xl bg-white px-6 py-5 text-sm font-extrabold text-slate-600 shadow-sm">
-          Loading Koryaal...
+          Loading BuildTrack AI Site Manager...
         </div>
       </div>
     )
@@ -201,6 +203,7 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
   const canViewDashboard = hasPermission('dashboard.view')
   const canUseFinancials = canViewFinancials || canSubmitReports
   const [openMenus, setOpenMenus] = useState({ projects: false, financials: false, users: false })
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   const nav = [
     { to: '/', label: 'Dashboard', icon: LayoutDashboard, show: canViewDashboard },
@@ -257,9 +260,9 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f7fb]">
+    <div className="min-h-screen bg-transparent">
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[260px] bg-[#050918] text-white lg:flex lg:flex-col">
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[280px] border-r border-white/10 bg-slate-950 text-white shadow-2xl shadow-slate-950/20 lg:flex lg:flex-col">
         <div className="px-6 py-6">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#12b8d2] text-[#06101f] shadow-lg shadow-cyan-500/20">
@@ -268,10 +271,10 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
 
             <div>
               <h1 className="text-lg font-black leading-none text-[#41dff2]">
-                Koryaal
+                BuildTrack AI
               </h1>
               <p className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-300">
-                {authUser?.company?.name || 'Company Workspace'}
+                Site Manager
               </p>
             </div>
           </div>
@@ -400,13 +403,24 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
       </aside>
 
       {/* Mobile Header */}
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/90 shadow-sm shadow-slate-950/5 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between gap-3 px-4 py-3">
-          <div className="min-w-0">
-            <h1 className="truncate text-xl font-black text-slate-950">Koryaal</h1>
-            <p className="truncate text-xs font-semibold text-slate-500">
-              {authUser?.company?.name || 'Company Workspace'}
-            </p>
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileSidebarOpen(true)}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm"
+              aria-label="Open navigation"
+            >
+              <Menu size={20} />
+            </button>
+
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-black text-slate-950">BuildTrack AI</h1>
+              <p className="truncate text-xs font-semibold text-slate-500">
+                {authUser?.company?.name || 'Company Workspace'}
+              </p>
+            </div>
           </div>
 
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-50 text-cyan-700 ring-4 ring-cyan-100">
@@ -420,10 +434,96 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
       </header>
 
       {/* Main Area */}
-      <main className="lg:ml-[260px]">
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-950/55 backdrop-blur-sm"
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-label="Close navigation overlay"
+          />
+          <aside className="relative flex h-full w-[86vw] max-w-[340px] flex-col bg-slate-950 text-white shadow-2xl">
+            <div className="flex items-center justify-between px-5 py-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#12b8d2] text-[#06101f]">
+                  <Building2 size={21} />
+                </div>
+                <div>
+                  <h1 className="text-base font-black leading-none text-[#41dff2]">BuildTrack AI</h1>
+                  <p className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-300">
+                    Site Manager
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileSidebarOpen(false)}
+                className="rounded-xl bg-white/10 p-2 text-slate-200"
+                aria-label="Close navigation"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <nav className="flex-1 space-y-1 overflow-y-auto px-4 pb-4">
+              {mobileNav.map((item) => {
+                const Icon = item.icon
+                return (
+                  <NavLink
+                    key={`${item.to}-${item.label}-drawer`}
+                    to={item.to}
+                    end={item.to === '/'}
+                    onClick={() => setMobileSidebarOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-extrabold transition ${
+                        isActive ? 'bg-[#12b8d2] text-[#04111f]' : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                      }`
+                    }
+                  >
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10">
+                      <Icon size={17} />
+                    </span>
+                    {item.label}
+                  </NavLink>
+                )
+              })}
+            </nav>
+
+            <div className="border-t border-white/10 p-4">
+              <Link
+                to="/how-to-use"
+                onClick={() => setMobileSidebarOpen(false)}
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-extrabold text-slate-300"
+              >
+                <HelpCircle size={17} />
+                Support
+              </Link>
+              <button
+                type="button"
+                onClick={logout}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-extrabold text-slate-300"
+              >
+                <LogOut size={17} />
+                Logout
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      <main className="lg:ml-[280px]">
         {/* Desktop Topbar */}
         <div className="sticky top-0 z-30 hidden border-b border-slate-200/70 bg-white/90 backdrop-blur lg:block">
-          <div className="flex h-[72px] items-center justify-end overflow-x-auto px-8">
+          <div className="flex h-[76px] items-center justify-between gap-6 overflow-x-auto px-8">
+            <div className="min-w-0">
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
+                BuildTrack AI Site Manager
+              </p>
+              <h2 className="truncate text-lg font-black text-slate-950">
+                {authUser?.company?.name || 'Company Workspace'}
+              </h2>
+            </div>
+
             <div className="flex items-center gap-7">
               <div className="flex items-center gap-6 text-sm font-extrabold">
                 <NavLink
@@ -545,7 +645,7 @@ function AppLayout({ authUser, onLogout, onUserUpdate }) {
         </div>
 
         {/* Page Content */}
-        <div className="mx-auto w-full max-w-[1180px] px-4 py-6 pb-32 sm:px-5 lg:px-8 lg:py-8 lg:pb-10">
+          <div className="mx-auto w-full max-w-[1240px] px-4 py-6 pb-32 sm:px-5 lg:px-8 lg:py-8 lg:pb-10">
           <Routes>
             <Route path="/" element={canViewDashboard ? <Dashboard authUser={authUser} /> : <Projects authUser={authUser} />} />
             <Route path="/projects" element={hasPermission('projects.view') ? <Projects authUser={authUser} /> : <Navigate to="/settings" replace />} />

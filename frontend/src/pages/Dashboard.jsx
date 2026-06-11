@@ -445,7 +445,7 @@ export default function Dashboard({ authUser }) {
         return {
           id: t.id || idx,
           title: t.description,
-          text: `Amount: $${Number(t.amount).toLocaleString()} • ${formatDate(t.date)}`,
+          text: `Amount: $${Number(t.amount).toLocaleString()} - ${formatDate(t.date)}`,
           badge: t.needs_review ? 'Pending Review' : 'Verified',
           icon: icons[idx % icons.length],
           iconClass: bgs[idx % bgs.length],
@@ -457,7 +457,7 @@ export default function Dashboard({ authUser }) {
       {
         id: 1,
         title: 'Site Survey Report #42',
-        text: 'Updated 2h ago • Taleh Construction',
+        text: 'Updated 2h ago - Taleh Construction',
         badge: 'Excel Ready',
         icon: FileText,
         iconClass: 'bg-emerald-50 text-emerald-600',
@@ -465,7 +465,7 @@ export default function Dashboard({ authUser }) {
       {
         id: 2,
         title: 'Weekly Finance Sync',
-        text: 'Automated run • Completed',
+        text: 'Automated run - Completed',
         badge: 'Saved',
         icon: RefreshCcw,
         iconClass: 'bg-cyan-50 text-cyan-600',
@@ -560,7 +560,7 @@ export default function Dashboard({ authUser }) {
 
           <p className="mt-2 text-sm font-medium text-slate-500">
             Welcome back,{' '}
-            <span className="font-extrabold text-slate-700">Administrator</span> •
+            <span className="font-extrabold text-slate-700">{authUser?.name || 'Administrator'}</span> -
             Analytics for{' '}
             <span className="font-extrabold text-slate-700">
               {isAll ? 'All Construction Projects' : selectedProject?.project_name}
@@ -589,7 +589,7 @@ export default function Dashboard({ authUser }) {
             />
 
             <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 border-l border-slate-200 pl-2 text-slate-400">
-              ▼
+              ?
             </div>
           </div>
 

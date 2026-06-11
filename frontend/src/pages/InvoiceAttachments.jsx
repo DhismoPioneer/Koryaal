@@ -80,7 +80,7 @@ export default function InvoiceAttachments() {
 
   return (
     <div className="space-y-8 animate-fade-in-up">
-      <section className="relative overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-sm">
+      <section className="page-hero">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.18),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.12),_transparent_35%)]" />
         <div className="relative p-6 lg:p-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold text-cyan-100">
@@ -114,7 +114,7 @@ export default function InvoiceAttachments() {
                   <option key={project.id} value={project.id}>{project.project_name}</option>
                 ))}
               </select>
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">?</span>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">v</span>
             </div>
           </Field>
 
@@ -202,7 +202,7 @@ export default function InvoiceAttachments() {
                         {attachment.original_name || 'Uploaded invoice'}
                       </p>
                       <p className="mt-1 text-xs font-semibold text-slate-400">
-                        Report #{attachment.daily_report_id} • {formatDate(attachment.report_date)}
+                        Report #{attachment.daily_report_id} â€¢ {formatDate(attachment.report_date)}
                       </p>
                     </div>
                     <ExternalLink size={16} className="shrink-0 text-slate-400 group-hover:text-cyan-600" />

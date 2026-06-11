@@ -5,10 +5,25 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  * {
+    @apply border-slate-200;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    background: #f8fafc;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top left, rgba(14, 165, 233, 0.08), transparent 28rem),
+      linear-gradient(180deg, #f8fafc 0%, #eef4f8 100%);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    color: #1e293b;
+    color: #0f172a;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -50,22 +65,34 @@
 }
 
 /* Utility classes */
-.input { 
-  @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-50; 
+.input {
+  @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-slate-300 focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100/70 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400;
 }
-.label { 
-  @apply block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5; 
+.label {
+  @apply mb-1.5 block text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500;
 }
-.btn { 
-  @apply rounded-xl px-5 py-3.5 font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-sm; 
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold shadow-sm transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60;
 }
-.btn-primary { 
-  @apply bg-[#0e7490] text-white hover:bg-[#0891b2] active:scale-95 shadow-cyan-600/10 hover:shadow-cyan-600/20 hover:shadow-lg; 
+.btn-primary {
+  @apply bg-cyan-700 text-white shadow-cyan-700/10 hover:-translate-y-0.5 hover:bg-cyan-600 hover:shadow-lg hover:shadow-cyan-700/20 active:translate-y-0 active:scale-95;
 }
-.btn-light { 
-  @apply bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 active:scale-95; 
+.btn-light {
+  @apply border border-slate-200 bg-white text-slate-700 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 active:translate-y-0 active:scale-95;
 }
-.card { 
-  @apply bg-white/80 backdrop-blur-md rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 transition-all duration-300; 
+.card {
+  @apply rounded-2xl border border-white/70 bg-white/90 shadow-[0_18px_50px_-32px_rgba(15,23,42,0.38)] backdrop-blur-md transition-all duration-300;
 }
 
+.page-hero {
+  @apply relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-[0_24px_70px_-38px_rgba(15,23,42,0.8)];
+}
+
+.page-hero::before {
+  content: '';
+  @apply pointer-events-none absolute inset-0;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(34, 211, 238, 0.22), transparent 24rem),
+    radial-gradient(circle at 6% 96%, rgba(59, 130, 246, 0.16), transparent 22rem),
+    linear-gradient(135deg, rgba(255,255,255,0.08), transparent 38%);
+}

@@ -75,7 +75,7 @@ export default function Settings({ authUser, onUserUpdate }) {
 
   return (
     <div className="space-y-8 animate-fade-in-up">
-      <section className="relative overflow-hidden rounded-[2rem] bg-slate-950 p-6 text-white shadow-sm lg:p-8">
+      <section className="page-hero p-6 lg:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.18),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.12),_transparent_35%)]" />
 
         <div className="relative">

@@ -339,7 +339,7 @@ export default function AddReport() {
 
     const safeProjectName = projectName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
 
-    saveAs(file, `koryaal_${safeProjectName}_${reportDate}.xlsx`)
+    saveAs(file, `buildtrack_${safeProjectName}_${reportDate}.xlsx`)
 
     setNotice({
       type: 'success',
@@ -350,7 +350,7 @@ export default function AddReport() {
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Top Banner Header */}
-      <section className="relative overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-sm">
+      <section className="page-hero">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.18),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.12),_transparent_35%)]" />
 
         <div className="relative p-6 lg:p-8">
@@ -440,7 +440,7 @@ export default function AddReport() {
                     ))}
                   </select>
                   <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">
-                    ▼
+                    ?
                   </span>
                 </div>
               </Field>
@@ -521,7 +521,7 @@ export default function AddReport() {
                       <option>Other</option>
                     </select>
                     <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">
-                      ▼
+                      ?
                     </span>
                   </div>
                 </Field>
@@ -801,9 +801,9 @@ Payment: EVC`}
                 Best Practices
               </h4>
               <ul className="space-y-1.5 text-xs font-semibold text-slate-500">
-                <li className="flex items-center gap-1.5">• Verify matched status indicators.</li>
-                <li className="flex items-center gap-1.5">• Assign transaction payments properly.</li>
-                <li className="flex items-center gap-1.5">• Export reports as management logs.</li>
+                <li className="flex items-center gap-1.5">- Verify matched status indicators.</li>
+                <li className="flex items-center gap-1.5">- Assign transaction payments properly.</li>
+                <li className="flex items-center gap-1.5">- Export reports as management logs.</li>
               </ul>
             </div>
           </div>

@@ -287,7 +287,7 @@ export default function Login({ onLogin }) {
   }[mode]
 
   const subtitle = {
-    login: 'Enter your Koryaal account details.',
+    login: 'Enter your BuildTrack AI account details.',
     register: 'Create a company workspace and first Admin / Owner account.',
     forgot: 'Admin, Engineer, Finance, or Client: enter your registered account email to receive a reset code.',
     verify: 'Enter the 6-digit code sent to your registered email inbox.',
@@ -307,7 +307,7 @@ export default function Login({ onLogin }) {
               </div>
 
               <div>
-                <h1 className="text-2xl font-black text-[#41dff2]">Koryaal</h1>
+                <h1 className="text-2xl font-black text-[#41dff2]">BuildTrack AI</h1>
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-slate-300">
                   Construction Management
                 </p>
@@ -340,7 +340,7 @@ export default function Login({ onLogin }) {
               </div>
 
               <div>
-                <h1 className="text-xl font-black text-slate-950">Koryaal</h1>
+                <h1 className="text-xl font-black text-slate-950">BuildTrack AI</h1>
                 <p className="text-xs font-semibold text-slate-500">Construction management</p>
               </div>
             </div>

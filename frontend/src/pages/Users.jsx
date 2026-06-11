@@ -292,7 +292,7 @@ export default function Users({ mode = 'list' }) {
 
   return (
     <div className="space-y-8 animate-fade-in-up">
-      <section className="relative overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-sm">
+      <section className="page-hero">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.18),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.12),_transparent_35%)]" />
 
         <div className="relative flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between lg:p-8">
@@ -305,7 +305,7 @@ export default function Users({ mode = 'list' }) {
               {isAddMode ? 'Add User' : 'Users'}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-300">
-              {isAddMode ? 'Create a team member, assign their role, permissions, and project access.' : 'Manage team members, project visibility, account status, and role-based permissions for Koryaal.'}
+              {isAddMode ? 'Create a team member, assign their role, permissions, and project access.' : 'Manage team members, project visibility, account status, and role-based permissions for BuildTrack AI.'}
             </p>
           </div>
 

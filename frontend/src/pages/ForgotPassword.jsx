@@ -70,7 +70,7 @@ export function AuthShell({ title, subtitle, children }) {
             <Building2 size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-black text-slate-950">Koryaal</h1>
+            <h1 className="text-xl font-black text-slate-950">BuildTrack AI</h1>
             <p className="text-xs font-semibold text-slate-500">Secure account recovery</p>
           </div>
         </div>

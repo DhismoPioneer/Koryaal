@@ -186,7 +186,7 @@ export default function Reports() {
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Top Banner Header */}
-      <section className="relative overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-sm">
+      <section className="page-hero">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.18),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.12),_transparent_35%)]" />
 
         <div className="relative flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between lg:p-8">
@@ -229,7 +229,7 @@ export default function Reports() {
                 ))}
               </select>
               <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">
-                ▼
+                ?
               </span>
             </div>
           </Field>
