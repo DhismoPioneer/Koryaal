@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Building2, CheckCircle2, KeyRound, Lock, Mail, LogIn, Phone, ShieldCheck } from 'lucide-react'
+import { Building2, KeyRound, Lock, Mail, LogIn, Phone, ShieldCheck } from 'lucide-react'
 import api from '../services/api'
 
 export default function Login({ onLogin }) {
@@ -303,88 +303,32 @@ export default function Login({ onLogin }) {
   }[mode]
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(8,145,178,0.12),_transparent_28rem),linear-gradient(135deg,#f8fafc_0%,#eef6f8_52%,#f8fafc_100%)] px-4 py-6 sm:py-10">
-      <div className="mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/80 bg-white/80 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.55)] backdrop-blur-xl lg:grid-cols-[1.02fr_0.98fr]">
-        <section className="relative hidden overflow-hidden bg-slate-950 p-10 text-white lg:block">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_12%,_rgba(34,211,238,0.22),_transparent_28rem),radial-gradient(circle_at_8%_86%,_rgba(37,99,235,0.18),_transparent_26rem)]" />
-          <div className="absolute inset-x-10 bottom-10 top-32 rounded-[2rem] border border-white/10 bg-white/[0.03]" />
-
-          <div className="relative flex h-full flex-col justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20">
-                <Building2 size={24} />
-              </div>
-
-              <div>
-                <h1 className="text-2xl font-black text-cyan-100">BuildTrack AI</h1>
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-slate-300">
-                  Site Manager
-                </p>
-              </div>
-            </div>
-
-            <div className="max-w-md">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold text-cyan-100">
-                <ShieldCheck size={14} />
-                Secure construction workspace
-              </div>
-
-              <h2 className="text-4xl font-black leading-tight tracking-tight">
-                Run your site operations from one clear dashboard.
-              </h2>
-
-              <p className="mt-4 text-sm leading-relaxed text-slate-300">
-                Keep projects, daily reports, transactions, invoices, messages, and team access organized without changing how your backend works.
-              </p>
-
-              <div className="mt-8 grid gap-3">
-                {['Project progress and budgets', 'Daily reports and finance logs', 'Role-based access for every team'].map((item) => (
-                  <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-bold text-slate-100">
-                    <CheckCircle2 size={17} className="text-cyan-300" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <AuthMetric label="Projects" value="Live" />
-              <AuthMetric label="Reports" value="Smart" />
-              <AuthMetric label="Access" value="Secure" />
-            </div>
-          </div>
-        </section>
-
-        <section className="flex items-center p-5 sm:p-8 lg:p-10">
-          <div className="w-full">
-          <div className="mb-8 lg:hidden">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-600 text-white shadow-lg shadow-cyan-700/20">
-                <Building2 size={22} />
-              </div>
-
-              <div>
-                <h1 className="text-xl font-black text-slate-950">BuildTrack AI</h1>
-                <p className="text-xs font-semibold text-slate-500">Site Manager</p>
-              </div>
-            </div>
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8">
+      <main className={`w-full ${mode === 'register' ? 'max-w-2xl' : 'max-w-md'}`}>
+        <div className="mb-8 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-700 text-white shadow-sm">
+            <Building2 size={23} />
           </div>
 
-          <div className="rounded-[1.75rem] border border-slate-200/70 bg-white p-5 shadow-[0_24px_70px_-45px_rgba(15,23,42,0.5)] sm:p-7">
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <span className="inline-flex rounded-full bg-cyan-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-700 ring-1 ring-cyan-600/10">
-                {modeLabel}
-              </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950">{title}</h2>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{subtitle}</p>
-            </div>
+          <h1 className="mt-4 text-xl font-black text-slate-950">BuildTrack AI</h1>
+          <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-400">
+            Site Manager
+          </p>
+        </div>
+
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.55)] sm:p-8">
+          <div className="mb-6 text-center">
+            <span className="inline-flex rounded-full bg-cyan-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-700 ring-1 ring-cyan-600/10">
+              {modeLabel}
+            </span>
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950">{title}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{subtitle}</p>
 
             {mode !== 'login' && (
               <button
                 type="button"
                 onClick={() => changeMode('login')}
-                className="w-fit rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-black text-slate-600 transition hover:bg-white hover:text-slate-950"
+                className="mt-4 text-sm font-black text-cyan-700 transition hover:text-cyan-600 hover:underline"
               >
                 Back to sign in
               </button>
@@ -658,23 +602,8 @@ export default function Login({ onLogin }) {
 
             </form>
           )}
-          </div>
-
-          <p className="mt-5 text-center text-xs font-semibold text-slate-400">
-            Protected workspace access for admins, engineers, finance teams, and clients.
-          </p>
-          </div>
         </section>
-      </div>
-    </div>
-  )
-}
-
-function AuthMetric({ label, value }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{label}</p>
-      <p className="mt-2 text-lg font-black text-white">{value}</p>
+      </main>
     </div>
   )
 }
