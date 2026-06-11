@@ -1,21 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Plus,
-  Compass,
-  Wallet,
-  ClipboardList,
-  FileText,
-  RefreshCcw,
-  UserPlus,
-  Layers3,
-  ArrowRight,
-  TrendingUp,
   AlertTriangle,
-  Activity,
+  ArrowRight,
+  BadgeDollarSign,
   Building2,
+  CalendarDays,
+  CheckCircle2,
+  ClipboardList,
+  Clock3,
+  Compass,
+  CreditCard,
+  FileText,
+  Flag,
+  FolderKanban,
+  Landmark,
   LayoutDashboard,
-  ShieldCheck,
+  MapPin,
+  Plus,
+  RefreshCcw,
+  Wallet,
   Wifi,
   WifiOff,
 } from 'lucide-react'
@@ -27,11 +31,15 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts'
 import api from '../services/api'
+
+const statusLabels = {
+  pending: 'Pending',
+  in_progress: 'In Progress',
+  completed: 'Completed',
+  delayed: 'Delayed',
+}
 
 export default function Dashboard({ authUser }) {
   const [dashboardData, setDashboardData] = useState({
@@ -65,6 +73,7 @@ export default function Dashboard({ authUser }) {
       ])
 
       const txData = txRes.data?.data || txRes.data || []
+      const projectData = projectsRes.data || []
 
       setDashboardData({
         companyName:
@@ -76,10 +85,10 @@ export default function Dashboard({ authUser }) {
           authUser?.company?.status ||
           'active',
         userRole: summaryRes.data?.user_role || authUser?.role || 'admin',
-        projectsCount: summaryRes.data?.projects || projectsRes.data?.length || 0,
+        projectsCount: summaryRes.data?.projects || projectData.length || 0,
         activeProjectsCount:
           summaryRes.data?.active_projects ||
-          projectsRes.data?.filter((p) => p.status === 'in_progress').length ||
+          projectData.filter((p) => p.status === 'in_progress').length ||
           0,
         pendingReportsCount: summaryRes.data?.pending_reports || 0,
         thisMonthExpenses: summaryRes.data?.this_month_expenses || 0,
@@ -88,7 +97,7 @@ export default function Dashboard({ authUser }) {
           summaryRes.data?.needs_review ||
           txData.filter((t) => t.needs_review).length ||
           0,
-        projects: projectsRes.data || [],
+        projects: projectData,
         transactions: txData,
       })
 
@@ -116,6 +125,7 @@ export default function Dashboard({ authUser }) {
             remaining_budget: 42000,
             status: 'in_progress',
             location: 'Hodan, Mogadishu',
+            end_date: '2026-07-15',
           },
           {
             id: 'mock-2',
@@ -125,6 +135,7 @@ export default function Dashboard({ authUser }) {
             remaining_budget: 42500,
             status: 'in_progress',
             location: 'Hodan, Mogadishu',
+            end_date: '2026-06-28',
           },
           {
             id: 'mock-3',
@@ -134,6 +145,7 @@ export default function Dashboard({ authUser }) {
             remaining_budget: 10000,
             status: 'delayed',
             location: 'Wadajir, Mogadishu',
+            end_date: '2026-06-09',
           },
           {
             id: 'mock-4',
@@ -143,6 +155,7 @@ export default function Dashboard({ authUser }) {
             remaining_budget: 0,
             status: 'completed',
             location: 'Waberi, Mogadishu',
+            end_date: '2026-05-28',
           },
         ],
         transactions: [
@@ -155,7 +168,7 @@ export default function Dashboard({ authUser }) {
             type: 'expense',
             date: '2026-06-05',
             needs_review: false,
-            payment: 'Paid (Cash)',
+            payment_method: 'Cash',
           },
           {
             id: 't-2',
@@ -166,18 +179,18 @@ export default function Dashboard({ authUser }) {
             type: 'expense',
             date: '2026-06-04',
             needs_review: true,
-            payment: 'Pending',
+            payment_method: 'Pending',
           },
           {
             id: 't-3',
             project_id: 'mock-2',
-            description: 'Plumbing fittings',
-            category: 'Raw Materials',
-            amount: 620,
-            type: 'expense',
+            description: 'Client payment milestone 2',
+            category: 'deposit',
+            amount: 1200,
+            type: 'income',
             date: '2026-06-04',
             needs_review: false,
-            payment: 'Paid (Transfer)',
+            payment_method: 'Bank',
           },
           {
             id: 't-4',
@@ -188,7 +201,7 @@ export default function Dashboard({ authUser }) {
             type: 'expense',
             date: '2026-06-03',
             needs_review: false,
-            payment: 'Paid (Check)',
+            payment_method: 'EVC Plus',
           },
           {
             id: 't-5',
@@ -199,29 +212,7 @@ export default function Dashboard({ authUser }) {
             type: 'expense',
             date: '2026-06-02',
             needs_review: false,
-            payment: 'Paid (Cash)',
-          },
-          {
-            id: 't-6',
-            project_id: 'mock-2',
-            description: 'Masonry work payment',
-            category: 'Labor & Contracting',
-            amount: 1200,
-            type: 'expense',
-            date: '2026-06-01',
-            needs_review: false,
-            payment: 'Paid (Transfer)',
-          },
-          {
-            id: 't-7',
-            project_id: 'mock-4',
-            description: 'Final inspection certificate',
-            category: 'Labor & Contracting',
-            amount: 500,
-            type: 'expense',
-            date: '2026-05-28',
-            needs_review: false,
-            payment: 'Paid (Transfer)',
+            payment_method: 'Cash',
           },
         ],
       })
@@ -240,10 +231,11 @@ export default function Dashboard({ authUser }) {
     transactions,
     companyName,
     companyStatus,
-    userRole,
     projectsCount,
     activeProjectsCount,
+    pendingReportsCount,
     thisMonthExpenses,
+    thisMonthIncome,
     needsReviewCount,
   } = dashboardData
 
@@ -256,324 +248,112 @@ export default function Dashboard({ authUser }) {
     ? transactions
     : transactions.filter((t) => String(t.project_id) === String(selectedProjectId))
 
-  let budgetTotal = 0
-  let spentTotal = 0
+  const projectRows = isAll ? projects : projects.filter((p) => String(p.id) === String(selectedProjectId))
 
-  if (isAll) {
-    projects.forEach((p) => {
-      budgetTotal += Number(p.budget || 0)
-      spentTotal += Number(p.spent_amount || 0)
-    })
-
-    if (budgetTotal === 0) {
-      budgetTotal = 580000
-      spentTotal = 485500
-    }
-  } else if (selectedProject) {
-    budgetTotal = Number(selectedProject.budget || 0)
-    spentTotal = Number(selectedProject.spent_amount || 0)
-  }
-
-  const utilizationPercent =
-    budgetTotal > 0 ? Math.min((spentTotal / budgetTotal) * 100, 100) : 0
-
-  let cardExpenses = 0
-
-  if (isAll) {
-    cardExpenses =
+  const metrics = useMemo(() => {
+    const expenseTotal =
       thisMonthExpenses ||
-      transactions
-        .filter((t) => t.type === 'expense')
-        .reduce((sum, t) => sum + Number(t.amount), 0)
+      filteredTransactions
+        .filter((t) => isExpense(t))
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0)
 
-    if (cardExpenses === 0) cardExpenses = 790
-  } else {
-    cardExpenses = filteredTransactions
-      .filter((t) => t.type === 'expense')
-      .reduce((sum, t) => sum + Number(t.amount), 0)
+    const incomeTotal =
+      thisMonthIncome ||
+      filteredTransactions
+        .filter((t) => isIncome(t))
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0)
 
-    if (cardExpenses === 0 && selectedProject) {
-      cardExpenses = Number(selectedProject.spent_amount) * 0.15
+    return {
+      totalProjects: isAll ? projectsCount || projects.length : projectRows.length,
+      activeProjects: isAll
+        ? activeProjectsCount || projects.filter((p) => p.status === 'in_progress').length
+        : projectRows.filter((p) => p.status === 'in_progress').length,
+      monthlyExpenses: expenseTotal,
+      clientPayments: incomeTotal,
+      reviewCount:
+        needsReviewCount ||
+        filteredTransactions.filter((t) => t.needs_review).length ||
+        pendingReportsCount,
     }
-  }
+  }, [
+    activeProjectsCount,
+    filteredTransactions,
+    isAll,
+    needsReviewCount,
+    pendingReportsCount,
+    projectRows,
+    projects,
+    projectsCount,
+    thisMonthExpenses,
+    thisMonthIncome,
+  ])
 
-  let activeCardValue = ''
-  let activeCardSubtitle = ''
-  let statusColor = 'text-cyan-600'
-  let statusBg = 'bg-cyan-50'
-
-  if (isAll) {
-    activeCardValue = String(
-      activeProjectsCount || projects.filter((p) => p.status === 'in_progress').length
-    )
-    activeCardSubtitle = `Out of ${projects.length || projectsCount} total projects`
-  } else if (selectedProject) {
-    const statusMap = {
-      in_progress: 'In Progress',
-      completed: 'Completed',
-      delayed: 'Delayed',
-      pending: 'Pending',
+  const statusSummary = useMemo(() => {
+    const source = isAll ? projects : projectRows
+    return {
+      pending: source.filter((p) => p.status === 'pending').length,
+      in_progress: source.filter((p) => p.status === 'in_progress').length,
+      completed: source.filter((p) => p.status === 'completed').length,
+      delayed: source.filter((p) => p.status === 'delayed').length,
     }
+  }, [isAll, projectRows, projects])
 
-    activeCardValue = statusMap[selectedProject.status] || 'Active'
-    activeCardSubtitle = selectedProject.location || 'Mogadishu, Somalia'
-
-    if (selectedProject.status === 'completed') {
-      statusColor = 'text-emerald-600'
-      statusBg = 'bg-emerald-50'
-    } else if (selectedProject.status === 'delayed') {
-      statusColor = 'text-rose-500'
-      statusBg = 'bg-rose-50'
-    } else if (selectedProject.status === 'pending') {
-      statusColor = 'text-slate-500'
-      statusBg = 'bg-slate-100'
-    }
-  }
-
-  const txCardValue = isAll
-    ? String(transactions.length || 1482)
-    : String(filteredTransactions.length)
-
-  const txCardSubtitle = isAll
-    ? '92% auto-categorized'
-    : `${filteredTransactions.filter((t) => t.needs_review).length} need review`
-
-  const alertsCount = isAll
-    ? needsReviewCount || transactions.filter((t) => t.needs_review).length
-    : filteredTransactions.filter((t) => t.needs_review).length
-
-  const getSparklineData = (type) => {
-    if (type === 'budget') {
-      return [{ v: 40 }, { v: 55 }, { v: 70 }, { v: 85 }, { v: utilizationPercent }]
-    }
-
-    if (type === 'expenses') {
-      return [{ v: 10 }, { v: 45 }, { v: 30 }, { v: 80 }, { v: 62 }]
-    }
-
-    if (type === 'transactions') {
-      return [{ v: 100 }, { v: 220 }, { v: 180 }, { v: 310 }, { v: 280 }]
-    }
-
-    return [{ v: 5 }, { v: 12 }, { v: 8 }, { v: 15 }, { v: alertsCount }]
-  }
-
-  const getTrendData = () => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-
-    if (isAll && isOffline) {
-      return [
-        { name: 'Jan', Budget: 40000, Actual: 32000 },
-        { name: 'Feb', Budget: 58000, Actual: 48000 },
-        { name: 'Mar', Budget: 47000, Actual: 43000 },
-        { name: 'Apr', Budget: 78000, Actual: 72000 },
-        { name: 'May', Budget: 95000, Actual: 88000 },
-        { name: 'Jun', Budget: 82000, Actual: 79000 },
-      ]
-    }
-
-    const baseBudget = budgetTotal / 6
-    const baseSpent = spentTotal / 6
-
-    return months.map((m, index) => {
-      const factor = 0.7 + index * 0.1
-
-      return {
-        name: m,
-        Budget: Math.round(baseBudget * factor),
-        Actual: Math.round(baseSpent * factor * (index === 5 ? 1.05 : 0.95)),
-      }
-    })
-  }
-
-  const getCategoryBreakdown = () => {
-    const breakdown = {}
-    let totalExpense = 0
-
-    filteredTransactions.forEach((t) => {
-      const cat = t.category || 'Other'
-      const amt = Number(t.amount || 0)
-
-      breakdown[cat] = (breakdown[cat] || 0) + amt
-      totalExpense += amt
-    })
-
-    if (totalExpense === 0) {
-      return [
-        { name: 'Labor & Contracting', amount: 340.0, percent: 43, color: 'bg-cyan-500' },
-        { name: 'Raw Materials', amount: 210.0, percent: 26.5, color: 'bg-emerald-500' },
-        { name: 'Equipment Rental', amount: 155.5, percent: 19.7, color: 'bg-orange-500' },
-        { name: 'Logistics & Fuel', amount: 84.5, percent: 10.8, color: 'bg-slate-400' },
-      ]
-    }
-
-    const colors = [
-      'bg-cyan-500',
-      'bg-emerald-500',
-      'bg-orange-500',
-      'bg-indigo-500',
-      'bg-pink-500',
-      'bg-slate-400',
-    ]
-
-    return Object.keys(breakdown)
-      .map((name, i) => {
-        const amount = breakdown[name]
-        const percent = totalExpense > 0 ? (amount / totalExpense) * 100 : 0
-
-        return {
-          name,
-          amount,
-          percent,
-          color: colors[i % colors.length],
-        }
-      })
-      .sort((a, b) => b.amount - a.amount)
-  }
-
-  const getActivities = () => {
-    if (filteredTransactions.length > 0) {
-      return filteredTransactions.slice(0, 4).map((t, idx) => {
-        const icons = [FileText, Layers3, Wallet, ClipboardList]
-        const bgs = [
-          'bg-cyan-50 text-cyan-600',
-          'bg-emerald-50 text-emerald-600',
-          'bg-amber-50 text-amber-600',
-          'bg-slate-100 text-slate-600',
-        ]
-
-        return {
-          id: t.id || idx,
-          title: t.description,
-          text: `Amount: $${Number(t.amount).toLocaleString()} - ${formatDate(t.date)}`,
-          badge: t.needs_review ? 'Pending Review' : 'Verified',
-          icon: icons[idx % icons.length],
-          iconClass: bgs[idx % bgs.length],
-        }
-      })
-    }
-
-    return [
-      {
-        id: 1,
-        title: 'Site Survey Report #42',
-        text: 'Updated 2h ago - Taleh Construction',
-        badge: 'Excel Ready',
-        icon: FileText,
-        iconClass: 'bg-emerald-50 text-emerald-600',
-      },
-      {
-        id: 2,
-        title: 'Weekly Finance Sync',
-        text: 'Automated run - Completed',
-        badge: 'Saved',
-        icon: RefreshCcw,
-        iconClass: 'bg-cyan-50 text-cyan-600',
-      },
-      {
-        id: 3,
-        title: 'Material Invoice Upload',
-        text: 'Processing 4 items...',
-        badge: 'Pending',
-        icon: Layers3,
-        iconClass: 'bg-amber-50 text-amber-600',
-      },
-      {
-        id: 4,
-        title: 'New Collaborator Added',
-        text: 'Sarah J. joined Project X',
-        badge: 'Access',
-        icon: UserPlus,
-        iconClass: 'bg-slate-100 text-slate-600',
-      },
-    ]
-  }
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-xl text-xs">
-          <p className="font-extrabold text-slate-400 mb-1.5 uppercase tracking-wider text-[10px]">
-            {label}
-          </p>
-
-          {payload.map((item, index) => (
-            <div key={index} className="flex items-center gap-2 mt-1">
-              <span
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: item.color || item.stroke }}
-              />
-
-              <span className="font-semibold text-slate-300">
-                {item.name}:{' '}
-                <span className="font-black text-white">
-                  ${Number(item.value).toLocaleString()}
-                </span>
-              </span>
-            </div>
-          ))}
-        </div>
-      )
-    }
-
-    return null
-  }
+  const chartData = useMemo(() => getMonthlyTrend(filteredTransactions), [filteredTransactions])
+  const reviewItems = filteredTransactions.filter((t) => t.needs_review).slice(0, 5)
+  const paymentMethods = getPaymentMethodSummary(filteredTransactions)
+  const milestones = getUpcomingMilestones(projectRows)
+  const recentReports = filteredTransactions.slice(0, 8)
 
   if (isLoading) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
-        <RefreshCcw className="h-10 w-10 animate-spin text-cyan-600" />
-        <p className="text-sm font-bold text-slate-500">
-          Loading enterprise metrics...
-        </p>
+      <div className="grid min-h-[60vh] place-items-center">
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-white px-8 py-7 shadow-sm">
+          <RefreshCcw className="h-9 w-9 animate-spin text-cyan-700" />
+          <p className="text-sm font-bold text-slate-600">Loading dashboard...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
-      <section className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-600/10">
-              <LayoutDashboard size={24} />
+    <div className="space-y-6 animate-fade-in-up">
+      <section className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-600/10">
+              <LayoutDashboard size={22} aria-hidden="true" />
             </div>
-
-            <div className="min-w-0">
-              <h2 className="text-3xl font-black tracking-tight text-slate-900">
-                Overview Dashboard
+            <div>
+              <h2 className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+                Executive Dashboard
               </h2>
+              <p className="mt-1 text-sm font-semibold text-slate-500">
+                {companyName} - {isAll ? 'All construction projects' : selectedProject?.project_name}
+              </p>
             </div>
-
-            {isOffline ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-black text-amber-700 ring-1 ring-inset ring-amber-600/10">
-                <WifiOff size={11} className="text-amber-500 animate-pulse" />
-                Demo Mode
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-black text-emerald-700 ring-1 ring-inset ring-emerald-600/10">
-                <Wifi size={11} className="text-emerald-500" />
-                Live Sync
-              </span>
-            )}
+            <SyncBadge isOffline={isOffline} />
           </div>
 
-          <p className="mt-2 text-sm font-medium text-slate-500">
-            Welcome back,{' '}
-            <span className="font-extrabold text-slate-700">{authUser?.name || 'Administrator'}</span> -
-            Analytics for{' '}
-            <span className="font-extrabold text-slate-700">
-              {isAll ? 'All Construction Projects' : selectedProject?.project_name}
-            </span>
-          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {Object.entries(statusSummary).map(([status, count]) => (
+              <StatusPill key={status} status={status} count={count} />
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[200px]">
+          <label className="sr-only" htmlFor="project-filter">Filter project</label>
+          <div className="relative min-w-[220px]">
+            <Compass
+              size={17}
+              aria-hidden="true"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+            />
             <select
+              id="project-filter"
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-slate-200 bg-white pl-10 pr-10 py-3.5 text-sm font-extrabold text-slate-700 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-50"
+              className="input appearance-none py-3 pl-10 pr-10"
             >
               <option value="all">All Projects</option>
               {projects.map((p) => (
@@ -582,505 +362,555 @@ export default function Dashboard({ authUser }) {
                 </option>
               ))}
             </select>
-
-            <Compass
-              size={17}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-            />
-
-            <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 border-l border-slate-200 pl-2 text-slate-400">
-              ?
-            </div>
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+              v
+            </span>
           </div>
 
           <button
+            type="button"
             onClick={() => fetchData(true)}
-            className="rounded-xl border border-slate-200 bg-white p-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-900 shadow-sm transition active:scale-95"
-            title="Refresh statistics"
+            className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-950 focus:outline-none focus:ring-4 focus:ring-cyan-100"
+            aria-label="Refresh dashboard"
+            title="Refresh dashboard"
           >
-            <RefreshCcw size={18} className={isRefreshing ? 'animate-spin' : ''} />
+            <RefreshCcw size={18} className={isRefreshing ? 'animate-spin' : ''} aria-hidden="true" />
           </button>
 
           <Link to="/add-report" className="btn btn-primary">
-            <Plus size={18} />
+            <Plus size={18} aria-hidden="true" />
             Add Report
           </Link>
         </div>
       </section>
 
-      <section className="grid gap-6">
-        <div className="card overflow-hidden p-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-600/10">
-                <Building2 size={26} />
-              </div>
-
-              <div>
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
-                  Current Company Workspace
-                </p>
-                <h3 className="mt-1 text-2xl font-black text-slate-950">
-                  {companyName}
-                </h3>
-                <p className="mt-1 text-xs font-semibold text-slate-500">
-                  This dashboard is filtered by the logged-in company only.
-                </p>
-              </div>
-            </div>
-
-            <span
-              className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-black ring-1 ring-inset ${
-                companyStatus === 'active'
-                  ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/10'
-                  : 'bg-slate-100 text-slate-600 ring-slate-600/10'
-              }`}
-            >
-              {companyStatus === 'active' ? 'Active Company' : companyStatus}
-            </span>
-          </div>
-        </div>
-
-        <div className="card p-6">
-          <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-600/10">
-              <ShieldCheck size={23} />
-            </div>
-
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
-                Access Role
-              </p>
-              <p className="mt-2 text-2xl font-black capitalize text-slate-950">
-                {userRole}
-              </p>
-              <p className="mt-2 text-xs font-semibold text-slate-500">
-                Your dashboard data is private to this company workspace.
-              </p>
-            </div>
-          </div>
-        </div>
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-12">
+        <KpiCard
+          className="xl:col-span-3"
+          label="Total Projects"
+          value={metrics.totalProjects}
+          helper={`${statusSummary.delayed} delayed, ${statusSummary.completed} completed`}
+          icon={FolderKanban}
+          tone="cyan"
+        />
+        <KpiCard
+          className="xl:col-span-3"
+          label="Active Projects"
+          value={metrics.activeProjects}
+          helper={`${statusSummary.pending} pending start`}
+          icon={Clock3}
+          tone="indigo"
+        />
+        <KpiCard
+          className="xl:col-span-3"
+          label="Monthly Expenses"
+          value={formatMoney(metrics.monthlyExpenses)}
+          helper="Current month outflow"
+          icon={Wallet}
+          tone="rose"
+        />
+        <KpiCard
+          className="xl:col-span-3"
+          label="Client Payments"
+          value={formatMoney(metrics.clientPayments)}
+          helper="Received this month"
+          icon={Landmark}
+          tone="emerald"
+        />
       </section>
 
-      <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="card p-6 hover:-translate-y-1 hover:shadow-xl hover:border-cyan-200/50 group">
-          <div className="flex items-start justify-between">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 group-hover:scale-110 transition duration-300">
-              <Compass size={22} />
-            </div>
-
-            <span className="rounded-full bg-cyan-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-cyan-700">
-              Utilization
-            </span>
-          </div>
-
-          <p className="mt-6 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
-            Budget Utilization
-          </p>
-
-          <h3 className="mt-1 text-3xl font-black text-slate-950">
-            {utilizationPercent.toFixed(1)}%
-          </h3>
-
-          <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-            <span>Spent: ${Math.round(spentTotal).toLocaleString()}</span>
-            <span>Total: ${Math.round(budgetTotal).toLocaleString()}</span>
-          </div>
-
-          <div className="mt-4 h-5 overflow-hidden rounded-full bg-slate-100/70 p-0.5">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-cyan-600 transition-all duration-1000"
-              style={{ width: `${utilizationPercent}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="card p-6 hover:-translate-y-1 hover:shadow-xl hover:border-orange-200/50 group">
-          <div className="flex items-start justify-between">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500 group-hover:scale-110 transition duration-300">
-              <Wallet size={22} />
-            </div>
-
-            <span className="rounded-full bg-rose-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-rose-600">
-              +12% MoM
-            </span>
-          </div>
-
-          <p className="mt-6 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
-            Active Outflow
-          </p>
-
-          <h3 className="mt-1 text-3xl font-black text-slate-950">
-            ${Math.round(cardExpenses).toLocaleString()}
-          </h3>
-
-          <p className="mt-2 text-xs font-semibold text-slate-500">
-            Summed current month transactions
-          </p>
-
-          <div className="mt-4 flex h-6 items-end gap-1">
-            {getSparklineData('expenses').map((item, idx) => (
-              <div
-                key={idx}
-                className="flex-1 rounded-sm bg-orange-100 hover:bg-orange-400 transition"
-                style={{ height: `${item.v}%` }}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="card p-6 hover:-translate-y-1 hover:shadow-xl hover:border-emerald-200/50 group">
-          <div className="flex items-start justify-between">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-110 transition duration-300">
-              <ClipboardList size={22} />
-            </div>
-
-            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
-              Financials
-            </span>
-          </div>
-
-          <p className="mt-6 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
-            Audit Transactions
-          </p>
-
-          <h3 className="mt-1 text-3xl font-black text-slate-950">
-            {txCardValue}
-          </h3>
-
-          <p className="mt-2 text-xs font-semibold text-slate-500">
-            {txCardSubtitle}
-          </p>
-
-          <div className="mt-4 flex h-6 items-end gap-1">
-            {getSparklineData('transactions').map((item, idx) => (
-              <div
-                key={idx}
-                className="flex-1 rounded-sm bg-emerald-100 hover:bg-emerald-400 transition"
-                style={{ height: `${item.v / 4}%` }}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="card p-6 hover:-translate-y-1 hover:shadow-xl hover:border-indigo-200/50 group">
-          <div className="flex items-start justify-between">
-            <div
-              className={`flex h-11 w-11 items-center justify-center rounded-xl ${statusBg} ${statusColor} group-hover:scale-110 transition duration-300`}
-            >
-              {selectedProjectId === 'all' ? (
-                <Layers3 size={22} />
-              ) : (
-                <AlertTriangle size={22} />
-              )}
-            </div>
-
-            <span
-              className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${
-                alertsCount > 0
-                  ? 'bg-amber-50 text-amber-700'
-                  : 'bg-slate-100 text-slate-600'
-              }`}
-            >
-              {alertsCount > 0 ? `${alertsCount} Warning` : 'Optimal'}
-            </span>
-          </div>
-
-          <p className="mt-6 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
-            {isAll ? 'Active Node Count' : 'Project Status'}
-          </p>
-
-          <h3 className="mt-1 text-3xl font-black text-slate-950">
-            {activeCardValue}
-          </h3>
-
-          <p className="mt-2 text-xs font-semibold text-slate-500">
-            {activeCardSubtitle}
-          </p>
-
-          <div className="mt-4 flex h-6 items-end gap-1">
-            {getSparklineData('alerts').map((item, idx) => (
-              <div
-                key={idx}
-                className={`flex-1 rounded-sm transition ${
-                  alertsCount > 0
-                    ? 'bg-amber-100 hover:bg-amber-400'
-                    : 'bg-indigo-100 hover:bg-indigo-400'
-                }`}
-                style={{ height: `${item.v * 15}%` }}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-3">
-        <div className="card p-6 xl:col-span-2">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-xl font-extrabold text-slate-900">
-                Financial Trend Analysis
-              </h3>
-              <p className="text-xs text-slate-400">
-                Monthly project budgeting vs actual resource spending
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4 text-xs font-black text-slate-500">
-              <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-[#0891b2]" />
-                Budget
-              </span>
-
-              <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-[#4f46e5]" />
-                Actual Spent
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-8 h-72">
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+        <Card className="xl:col-span-8">
+          <CardHeader
+            icon={TrendingIcon}
+            title="Expenses vs Payments"
+            subtitle="Monthly cash movement across selected projects"
+          />
+          <div className="mt-6 h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={getTrendData()}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
+              <AreaChart data={chartData} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="colorBudget" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0891b2" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#0891b2" stopOpacity={0} />
+                  <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.16} />
+                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
                   </linearGradient>
-
-                  <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
+                  <linearGradient id="paymentGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.16} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-
-                <XAxis
-                  dataKey="name"
-                  stroke="#94a3b8"
-                  fontSize={11}
-                  fontWeight={700}
-                  tickLine={false}
-                  axisLine={false}
-                />
-
+                <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" tickLine={false} axisLine={false} stroke="#64748b" fontSize={12} />
                 <YAxis
-                  stroke="#94a3b8"
-                  fontSize={11}
-                  fontWeight={700}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+                  stroke="#64748b"
+                  fontSize={12}
+                  tickFormatter={(value) => `$${value >= 1000 ? `${Math.round(value / 1000)}k` : value}`}
                 />
-
-                <Tooltip content={<CustomTooltip />} />
-
+                <Tooltip content={<ChartTooltip />} />
                 <Area
-                  name="Budget"
                   type="monotone"
-                  dataKey="Budget"
-                  stroke="#0891b2"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorBudget)"
+                  dataKey="Expenses"
+                  stroke="#e11d48"
+                  strokeWidth={2.5}
+                  fill="url(#expenseGradient)"
                 />
-
                 <Area
-                  name="Actual Spent"
                   type="monotone"
-                  dataKey="Actual"
-                  stroke="#4f46e5"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorActual)"
+                  dataKey="Payments"
+                  stroke="#059669"
+                  strokeWidth={2.5}
+                  fill="url(#paymentGradient)"
                 />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
 
-        <div className="card p-6 flex flex-col justify-between">
-          <div>
-            <h3 className="text-xl font-extrabold text-slate-900">Project Health</h3>
-            <p className="text-xs text-slate-400">
-              Total project spending limits indicator
-            </p>
-          </div>
-
-          <div className="relative flex justify-center mt-6">
-            <ResponsiveContainer width="100%" height={150}>
-              <PieChart>
-                <Pie
-                  data={[
-                    { value: utilizationPercent },
-                    { value: Math.max(0, 100 - utilizationPercent) },
-                  ]}
-                  cx="50%"
-                  cy="90%"
-                  startAngle={180}
-                  endAngle={0}
-                  innerRadius={65}
-                  outerRadius={85}
-                  dataKey="value"
-                  stroke="none"
-                >
-                  <Cell fill="url(#gaugeCyanGrad)" />
-                  <Cell fill="#f1f5f9" />
-                </Pie>
-
-                <defs>
-                  <linearGradient id="gaugeCyanGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#06b6d4" />
-                    <stop offset="100%" stopColor="#0891b2" />
-                  </linearGradient>
-                </defs>
-              </PieChart>
-            </ResponsiveContainer>
-
-            <div className="absolute bottom-2 flex flex-col items-center">
-              <span className="text-4xl font-black text-slate-900 leading-none">
-                {utilizationPercent.toFixed(0)}%
-              </span>
-
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mt-1.5">
-                Utilized
-              </span>
-            </div>
-          </div>
-
-          <p className="mt-4 text-center text-xs font-semibold leading-relaxed text-slate-500">
-            {utilizationPercent > 90
-              ? 'Warning: Spent amounts are nearing budget limits!'
-              : 'Budget usage is within optimal range for current timeline.'}
-          </p>
-
-          <Link
-            to="/reports"
-            className="mt-6 flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-3.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition"
-          >
-            <TrendingUp size={15} />
-            View Detailed Audit Logs
-          </Link>
-        </div>
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-2">
-        <div className="card p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-extrabold text-slate-900">
-                Expense Allocation
-              </h3>
-              <p className="text-xs text-slate-400">
-                Category breakdown of transactions
-              </p>
-            </div>
-
-            <span className="rounded-full bg-cyan-50 px-3 py-1.5 text-xs font-black text-cyan-700">
-              Monthly breakdown
-            </span>
-          </div>
-
-          <div className="mt-8 space-y-6">
-            {getCategoryBreakdown().map((item, idx) => (
-              <div
-                key={item.name}
-                className="animate-fade-in-up"
-                style={{ animationDelay: `${idx * 100}ms` }}
-              >
-                <div className="flex items-center justify-between text-sm">
-                  <p className="font-extrabold text-slate-700">{item.name}</p>
-
-                  <p className="font-extrabold text-slate-950">
-                    ${Number(item.amount).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                    })}{' '}
-                    ({item.percent.toFixed(1)}%)
-                  </p>
-                </div>
-
-                <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className={`h-full rounded-full ${item.color} transition-all duration-1000`}
-                    style={{ width: `${item.percent}%` }}
-                  />
-                </div>
+          <div className="mt-6 grid gap-3 border-t border-slate-100 pt-5 sm:grid-cols-3">
+            {paymentMethods.slice(0, 3).map((item) => (
+              <div key={item.name} className="rounded-xl bg-slate-50 px-4 py-3">
+                <p className="text-xs font-black uppercase tracking-wide text-slate-500">{item.name}</p>
+                <p className="mt-1 font-mono text-lg font-black text-slate-950">{formatMoney(item.amount)}</p>
               </div>
             ))}
           </div>
-        </div>
+        </Card>
 
-        <div className="card p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-extrabold text-slate-900">
-                Activity & Logs
-              </h3>
-              <p className="text-xs text-slate-400">
-                Parsed items and sync stream
-              </p>
-            </div>
-
-            <Link
-              to="/reports"
-              className="text-xs font-black text-[#007c8f] hover:underline flex items-center gap-1"
-            >
-              View All Reports
-              <ArrowRight size={13} />
-            </Link>
+        <Card className="xl:col-span-4">
+          <CardHeader
+            icon={AlertTriangle}
+            title="Reports Needing Review"
+            subtitle={`${metrics.reviewCount} item${metrics.reviewCount === 1 ? '' : 's'} need attention`}
+          />
+          <div className="mt-6 space-y-3">
+            {reviewItems.length > 0 ? (
+              reviewItems.map((item) => (
+                <ReviewItem key={item.id || `${item.description}-${item.date}`} item={item} projects={projects} />
+              ))
+            ) : (
+              <EmptyState
+                icon={CheckCircle2}
+                title="No reports waiting"
+                text="Everything visible in this project scope is reviewed."
+              />
+            )}
           </div>
-
-          <div className="mt-6 space-y-5">
-            {getActivities().map((item, idx) => {
-              const Icon = item.icon
-
-              return (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 rounded-xl p-2 hover:bg-slate-50 transition duration-300 animate-fade-in-up"
-                  style={{ animationDelay: `${idx * 75}ms` }}
-                >
-                  <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${item.iconClass}`}
-                  >
-                    <Icon size={18} />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-extrabold text-slate-900">
-                      {item.title}
-                    </p>
-
-                    <p className="mt-1 text-xs font-medium text-slate-400">
-                      {item.text}
-                    </p>
-                  </div>
-
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wide shrink-0 ${
-                      item.badge === 'Pending' || item.badge === 'Pending Review'
-                        ? 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10'
-                        : item.badge === 'Access'
-                          ? 'bg-slate-100 text-slate-700'
-                          : item.badge === 'Saved' || item.badge === 'Verified'
-                            ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/10'
-                            : 'bg-cyan-50 text-cyan-700'
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
+          <Link to="/reports" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-cyan-700 hover:text-cyan-600">
+            Open reports
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </Card>
       </section>
+
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+        <Card className="xl:col-span-8">
+          <CardHeader
+            icon={Building2}
+            title="Project Status"
+            subtitle="Budget, spend, schedule, and current status"
+          />
+          <div className="mt-5 overflow-x-auto">
+            <table className="w-full min-w-[860px] text-sm">
+              <thead className="sticky top-0 bg-white text-left text-xs font-black uppercase tracking-wide text-slate-500">
+                <tr className="border-b border-slate-200">
+                  <th className="px-3 py-3">Project</th>
+                  <th className="px-3 py-3">Location</th>
+                  <th className="px-3 py-3 text-right">Budget</th>
+                  <th className="px-3 py-3 text-right">Spent</th>
+                  <th className="px-3 py-3">Progress</th>
+                  <th className="px-3 py-3 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {projectRows.slice(0, 8).map((project) => {
+                  const budget = Number(project.budget || 0)
+                  const spent = Number(project.spent_amount || 0)
+                  const progress = budget > 0 ? Math.min((spent / budget) * 100, 100) : getProjectProgress(project)
+
+                  return (
+                    <tr key={project.id} className="transition hover:bg-slate-50">
+                      <td className="px-3 py-4">
+                        <p className="font-black text-slate-950">{project.project_name}</p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">Due {formatDate(project.end_date)}</p>
+                      </td>
+                      <td className="px-3 py-4 text-sm font-semibold text-slate-600">
+                        <span className="inline-flex items-center gap-1.5">
+                          <MapPin size={14} aria-hidden="true" className="text-slate-400" />
+                          {project.location || 'No location'}
+                        </span>
+                      </td>
+                      <td className="px-3 py-4 text-right font-mono font-bold text-slate-900">{formatMoney(budget)}</td>
+                      <td className="px-3 py-4 text-right font-mono font-bold text-slate-900">{formatMoney(spent)}</td>
+                      <td className="px-3 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-2 w-24 overflow-hidden rounded-full bg-slate-100">
+                            <div className="h-full rounded-full bg-cyan-600" style={{ width: `${progress}%` }} />
+                          </div>
+                          <span className="font-mono text-xs font-black text-slate-600">{Math.round(progress)}%</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-4 text-center">
+                        <StatusBadge status={project.status} />
+                      </td>
+                    </tr>
+                  )
+                })}
+
+                {projectRows.length === 0 && (
+                  <tr>
+                    <td colSpan="6" className="px-3 py-12">
+                      <EmptyState icon={FolderKanban} title="No projects found" text="Create a project to start tracking site activity." />
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        <Card className="xl:col-span-4">
+          <CardHeader
+            icon={Flag}
+            title="Upcoming Milestones"
+            subtitle="Deadlines and project tasks that need attention"
+          />
+          <div className="mt-6 space-y-4">
+            {milestones.length > 0 ? (
+              milestones.map((item) => <MilestoneItem key={item.id} item={item} />)
+            ) : (
+              <EmptyState
+                icon={CalendarDays}
+                title="No urgent milestones"
+                text="No upcoming due dates found for this project scope."
+              />
+            )}
+          </div>
+        </Card>
+      </section>
+
+      <Card>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <CardHeader
+            icon={ClipboardList}
+            title="Recent Daily Reports"
+            subtitle="Latest site transactions and report activity"
+          />
+          <Link to="/reports" className="btn btn-light px-4 py-2.5">
+            View Reports
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[920px] text-sm">
+            <thead className="sticky top-0 bg-white text-left text-xs font-black uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-slate-200">
+                <th className="px-3 py-3">Date</th>
+                <th className="px-3 py-3">Project</th>
+                <th className="px-3 py-3">Description</th>
+                <th className="px-3 py-3">Category</th>
+                <th className="px-3 py-3">Payment</th>
+                <th className="px-3 py-3 text-right">Amount</th>
+                <th className="px-3 py-3 text-center">Review</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {recentReports.map((item) => (
+                <tr key={item.id || `${item.description}-${item.date}`} className="transition hover:bg-slate-50">
+                  <td className="px-3 py-4 text-xs font-bold text-slate-500">{formatDate(item.date || item.report_date)}</td>
+                  <td className="px-3 py-4 font-bold text-slate-700">{getProjectName(projects, item.project_id)}</td>
+                  <td className="px-3 py-4 font-black text-slate-950">{item.description || 'Daily report item'}</td>
+                  <td className="px-3 py-4">
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">
+                      {item.category || 'Other'}
+                    </span>
+                  </td>
+                  <td className="px-3 py-4 text-sm font-semibold text-slate-600">{getPaymentMethod(item)}</td>
+                  <td className={`px-3 py-4 text-right font-mono font-black ${isIncome(item) ? 'text-emerald-700' : 'text-slate-950'}`}>
+                    {isIncome(item) ? '+' : '-'}{formatMoney(Number(item.amount || 0))}
+                  </td>
+                  <td className="px-3 py-4 text-center">
+                    <ReviewBadge reviewed={!item.needs_review} />
+                  </td>
+                </tr>
+              ))}
+
+              {recentReports.length === 0 && (
+                <tr>
+                  <td colSpan="7" className="px-3 py-12">
+                    <EmptyState icon={FileText} title="No recent reports" text="Daily reports will appear here after they are submitted." />
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   )
+}
+
+function Card({ className = '', children }) {
+  return (
+    <section className={`rounded-xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
+      {children}
+    </section>
+  )
+}
+
+function CardHeader({ icon: Icon, title, subtitle }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+        <Icon size={18} aria-hidden="true" />
+      </div>
+      <div>
+        <h3 className="text-lg font-black text-slate-950">{title}</h3>
+        {subtitle && <p className="mt-1 text-sm font-semibold text-slate-500">{subtitle}</p>}
+      </div>
+    </div>
+  )
+}
+
+function KpiCard({ className = '', label, value, helper, icon: Icon, tone }) {
+  const tones = {
+    cyan: 'bg-cyan-50 text-cyan-700 ring-cyan-600/10',
+    indigo: 'bg-indigo-50 text-indigo-700 ring-indigo-600/10',
+    rose: 'bg-rose-50 text-rose-700 ring-rose-600/10',
+    emerald: 'bg-emerald-50 text-emerald-700 ring-emerald-600/10',
+  }
+
+  return (
+    <article className={`rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${className}`}>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-bold text-slate-500">{label}</p>
+          <p className="mt-3 font-mono text-3xl font-black tracking-tight text-slate-950">{value}</p>
+        </div>
+        <div className={`flex h-11 w-11 items-center justify-center rounded-xl ring-1 ${tones[tone] || tones.cyan}`}>
+          <Icon size={21} aria-hidden="true" />
+        </div>
+      </div>
+      <p className="mt-4 text-sm font-semibold text-slate-500">{helper}</p>
+    </article>
+  )
+}
+
+function SyncBadge({ isOffline }) {
+  return isOffline ? (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-700 ring-1 ring-amber-600/10">
+      <WifiOff size={12} aria-hidden="true" />
+      Demo Mode
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700 ring-1 ring-emerald-600/10">
+      <Wifi size={12} aria-hidden="true" />
+      Live Sync
+    </span>
+  )
+}
+
+function StatusPill({ status, count }) {
+  return (
+    <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black ring-1 ring-inset ${getStatusClasses(status)}`}>
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      {statusLabels[status] || status}: {count}
+    </span>
+  )
+}
+
+function StatusBadge({ status }) {
+  return (
+    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-black ring-1 ring-inset ${getStatusClasses(status)}`}>
+      {statusLabels[status] || status || 'Pending'}
+    </span>
+  )
+}
+
+function ReviewBadge({ reviewed }) {
+  return reviewed ? (
+    <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-700 ring-1 ring-emerald-600/10">
+      Verified
+    </span>
+  ) : (
+    <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-xs font-black text-amber-700 ring-1 ring-amber-600/10">
+      Review
+    </span>
+  )
+}
+
+function ReviewItem({ item, projects }) {
+  return (
+    <div className="rounded-xl border border-amber-100 bg-amber-50/60 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate font-black text-slate-950">{item.description || 'Report needs review'}</p>
+          <p className="mt-1 text-xs font-bold text-slate-500">
+            {getProjectName(projects, item.project_id)} - {formatDate(item.date || item.report_date)}
+          </p>
+        </div>
+        <span className="font-mono text-sm font-black text-amber-800">{formatMoney(Number(item.amount || 0))}</span>
+      </div>
+    </div>
+  )
+}
+
+function MilestoneItem({ item }) {
+  const isLate = item.daysLeft < 0
+  return (
+    <div className="flex gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isLate ? 'bg-rose-50 text-rose-700' : 'bg-cyan-50 text-cyan-700'}`}>
+        {isLate ? <AlertTriangle size={17} aria-hidden="true" /> : <Flag size={17} aria-hidden="true" />}
+      </div>
+      <div className="min-w-0">
+        <p className="font-black text-slate-950">{item.title}</p>
+        <p className="mt-1 text-sm font-semibold text-slate-500">{item.projectName}</p>
+        <p className={`mt-2 text-xs font-black ${isLate ? 'text-rose-700' : 'text-cyan-700'}`}>
+          {isLate ? `${Math.abs(item.daysLeft)} days overdue` : `${item.daysLeft} days left`} - {formatDate(item.date)}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function EmptyState({ icon: Icon, title, text }) {
+  return (
+    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-5 py-8 text-center">
+      <Icon size={24} aria-hidden="true" className="mx-auto text-slate-400" />
+      <p className="mt-3 font-black text-slate-800">{title}</p>
+      <p className="mt-1 text-sm font-semibold text-slate-500">{text}</p>
+    </div>
+  )
+}
+
+function ChartTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs shadow-xl">
+      <p className="mb-2 font-black uppercase tracking-wide text-slate-400">{label}</p>
+      {payload.map((item) => (
+        <div key={item.name} className="mt-1 flex items-center gap-2 text-slate-200">
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.stroke }} />
+          <span className="font-bold">
+            {item.name}: <span className="font-mono text-white">{formatMoney(Number(item.value || 0))}</span>
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function TrendingIcon(props) {
+  return <BadgeDollarSign {...props} />
+}
+
+function getStatusClasses(status) {
+  const styles = {
+    pending: 'bg-slate-100 text-slate-700 ring-slate-600/10',
+    in_progress: 'bg-cyan-50 text-cyan-700 ring-cyan-600/10',
+    completed: 'bg-emerald-50 text-emerald-700 ring-emerald-600/10',
+    delayed: 'bg-rose-50 text-rose-700 ring-rose-600/10',
+  }
+  return styles[status] || styles.pending
+}
+
+function getProjectName(projects, projectId) {
+  return projects.find((project) => String(project.id) === String(projectId))?.project_name || 'Unassigned'
+}
+
+function isIncome(transaction) {
+  const type = String(transaction.type || '').toLowerCase()
+  const category = String(transaction.category || '').toLowerCase()
+  return type === 'income' || category === 'deposit'
+}
+
+function isExpense(transaction) {
+  return !isIncome(transaction)
+}
+
+function getPaymentMethod(transaction) {
+  return transaction.payment_method || transaction.payment || 'Not provided'
+}
+
+function getPaymentMethodSummary(transactions) {
+  const summary = {}
+  transactions.forEach((transaction) => {
+    const name = getPaymentMethod(transaction)
+    summary[name] = (summary[name] || 0) + Number(transaction.amount || 0)
+  })
+
+  const rows = Object.entries(summary)
+    .map(([name, amount]) => ({ name, amount }))
+    .sort((a, b) => b.amount - a.amount)
+
+  if (rows.length > 0) return rows
+  return [
+    { name: 'Cash', amount: 0 },
+    { name: 'Bank', amount: 0 },
+    { name: 'EVC Plus', amount: 0 },
+  ]
+}
+
+function getMonthlyTrend(transactions) {
+  const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+  const baseRows = monthLabels.map((name) => ({ name, Expenses: 0, Payments: 0 }))
+
+  transactions.forEach((transaction) => {
+    const date = transaction.date || transaction.report_date
+    const monthIndex = date ? new Date(String(date).slice(0, 10)).getMonth() : -1
+    if (monthIndex < 0 || monthIndex > 5) return
+
+    if (isIncome(transaction)) {
+      baseRows[monthIndex].Payments += Number(transaction.amount || 0)
+    } else {
+      baseRows[monthIndex].Expenses += Number(transaction.amount || 0)
+    }
+  })
+
+  const hasData = baseRows.some((row) => row.Expenses > 0 || row.Payments > 0)
+  if (hasData) return baseRows
+
+  return [
+    { name: 'Jan', Expenses: 32000, Payments: 36000 },
+    { name: 'Feb', Expenses: 48000, Payments: 52000 },
+    { name: 'Mar', Expenses: 43000, Payments: 39000 },
+    { name: 'Apr', Expenses: 72000, Payments: 76000 },
+    { name: 'May', Expenses: 88000, Payments: 84000 },
+    { name: 'Jun', Expenses: 79000, Payments: 94000 },
+  ]
+}
+
+function getUpcomingMilestones(projects) {
+  const today = new Date()
+  return projects
+    .filter((project) => project.end_date && project.status !== 'completed')
+    .map((project) => {
+      const due = new Date(String(project.end_date).slice(0, 10))
+      const daysLeft = Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+      return {
+        id: project.id,
+        title: project.status === 'delayed' ? 'Resolve delayed schedule' : 'Upcoming handoff deadline',
+        projectName: project.project_name,
+        date: project.end_date,
+        daysLeft,
+      }
+    })
+    .filter((item) => item.daysLeft <= 30)
+    .sort((a, b) => a.daysLeft - b.daysLeft)
+    .slice(0, 5)
+}
+
+function getProjectProgress(project) {
+  if (project.status === 'completed') return 100
+  if (project.status === 'pending') return 8
+  if (project.status === 'delayed') return 76
+  return 42
+}
+
+function formatMoney(value) {
+  return `$${Number(value || 0).toLocaleString(undefined, {
+    maximumFractionDigits: 0,
+  })}`
 }
 
 function formatDate(dateValue) {
@@ -1091,13 +921,11 @@ function formatDate(dateValue) {
     const [year, month, day] = parts
     const months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ]
-    const mIdx = parseInt(month, 10) - 1
-    if (mIdx >= 0 && mIdx < 12) {
-      const monthStr = months[mIdx]
-      const dayVal = parseInt(day, 10)
-      return `${monthStr} ${dayVal}, ${year}`
+    const monthIndex = parseInt(month, 10) - 1
+    if (monthIndex >= 0 && monthIndex < 12) {
+      return `${months[monthIndex]} ${parseInt(day, 10)}, ${year}`
     }
   }
   return cleanStr
