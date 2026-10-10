@@ -1,98 +1,107 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    color-scheme: light;
-  }
-
-  * {
-    @apply border-slate-200;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
-    min-height: 100vh;
-    background:
-      radial-gradient(circle at top left, rgba(14, 165, 233, 0.08), transparent 28rem),
-      linear-gradient(180deg, #f8fafc 0%, #eef4f8 100%);
+    background-color: #f8fafc;
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: #0f172a;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
   }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
-  border-radius: 10px;
+  background: #cbd5e1;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
+  background: #94a3b8;
 }
 
-/* Animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Architectural Blueprint subtle grid */
+.blueprint-grid {
+  background-image:
+    linear-gradient(to right, rgba(14, 165, 233, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(14, 165, 233, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.blueprint-grid-dark {
+  background-image:
+    linear-gradient(to right, rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
-/* Utility classes */
+/* High-craft Components */
+.card-modern {
+  @apply rounded-2xl border border-slate-200/80 bg-white shadow-card transition-all duration-300;
+}
+
+.card-hover-lift {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover hover:border-slate-300/90;
+}
+
 .input {
-  @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-slate-300 focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100/70 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400;
+  @apply w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm font-semibold text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-500/10 sm:py-3 sm:px-4;
 }
+
 .label {
-  @apply mb-1.5 block text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500;
+  @apply block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5;
 }
+
 .btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold shadow-sm transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all duration-200 active:scale-[0.98] sm:px-5 sm:py-3;
 }
+
 .btn-primary {
-  @apply bg-cyan-700 text-white shadow-cyan-700/10 hover:-translate-y-0.5 hover:bg-cyan-600 hover:shadow-lg hover:shadow-cyan-700/20 active:translate-y-0 active:scale-95;
+  @apply bg-cyan-700 text-white shadow-sm shadow-cyan-900/10 hover:bg-cyan-600 hover:shadow-md hover:shadow-cyan-600/20 active:bg-cyan-800;
 }
+
+.btn-dark {
+  @apply bg-slate-900 text-white shadow-sm hover:bg-slate-800 active:bg-black;
+}
+
 .btn-light {
-  @apply border border-slate-200 bg-white text-slate-700 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 active:translate-y-0 active:scale-95;
+  @apply border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300;
 }
+
+.badge-tag {
+  @apply inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold;
+}
+
+/* Glass panel */
+.glass-panel {
+  @apply bg-white/80 backdrop-blur-md border border-white/50 shadow-sm;
+}
+
+
+
+/* Shared styling for all restored repository pages. */
 .card {
-  @apply rounded-2xl border border-white/70 bg-white/90 shadow-[0_18px_50px_-32px_rgba(15,23,42,0.38)] backdrop-blur-md transition-all duration-300;
+  @apply rounded-2xl border border-slate-200/80 bg-white shadow-card transition-all duration-300;
 }
-
 .page-hero {
-  @apply relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-[0_24px_70px_-38px_rgba(15,23,42,0.8)];
+  @apply relative overflow-hidden rounded-2xl border border-slate-800 bg-[#0B0F19] text-white shadow-card;
+  background-image: linear-gradient(to right, rgba(56,189,248,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(56,189,248,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
-
-.page-hero::before {
-  content: '';
-  @apply pointer-events-none absolute inset-0;
-  background:
-    radial-gradient(circle at 88% 12%, rgba(34, 211, 238, 0.22), transparent 24rem),
-    radial-gradient(circle at 6% 96%, rgba(59, 130, 246, 0.16), transparent 22rem),
-    linear-gradient(135deg, rgba(255,255,255,0.08), transparent 38%);
-}
+.btn:disabled { @apply cursor-not-allowed opacity-60; }
+.input:disabled { @apply cursor-not-allowed bg-slate-100 text-slate-400; }

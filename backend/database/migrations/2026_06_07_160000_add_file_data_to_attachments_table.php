@@ -9,7 +9,13 @@ return new class extends Migration {
     public function up(): void
     {
         if (!Schema::hasColumn('attachments', 'file_data')) {
-            DB::statement('ALTER TABLE attachments ADD COLUMN file_data LONGBLOB NULL AFTER file_path');
+            if (in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+                DB::statement('ALTER TABLE attachments ADD COLUMN file_data LONGBLOB NULL AFTER file_path');
+            } else {
+                Schema::table('attachments', function (Blueprint $table) {
+                    $table->binary('file_data')->nullable();
+                });
+            }
         }
 
         Schema::table('attachments', function (Blueprint $table) {
@@ -40,4 +46,3 @@ return new class extends Migration {
         });
     }
 };
-

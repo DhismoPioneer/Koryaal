@@ -1,5 +1,27 @@
 # Koryaal - Starter Project
 
+## Local design and demo workspace
+
+The app uses the Koryaal dark sidebar and cyan theme, with expandable Projects,
+Financials, and Users menus on desktop and mobile. The existing report, cashflow,
+invoice, password recovery, and user management features remain available.
+
+To create a separate sample workspace without replacing existing records:
+
+```bash
+cd backend
+php artisan migrate
+php artisan db:seed --class=BuildTrackDemoSeeder
+```
+
+The sample workspace contains four projects, four users, twenty reports and
+transactions, and four sample PDF invoices. Re-running the seeder does not
+duplicate these records. Sample dates use the current month in Africa/Nairobi.
+
+For this demo workspace, sign in as `admin@demo.koryaal.test` with
+`KoryaalDemo123!`. The `finance`, `engineer`, and `client` accounts use the same
+email domain and demo password. These credentials are for sample data only.
+
 Mobile-first internal construction management starter system for engineering/construction companies.
 
 This starter includes:
@@ -16,7 +38,7 @@ This starter includes:
 matoor = 35
 Matoor 8
 15 farsamo yaqaan pom
-
+Total = 158
 ```
 
 ---
@@ -78,7 +100,7 @@ Then go to **Add WhatsApp Report**, paste this sample, and click **Extract Previ
 matoor = 35
 Matoor 8
 15 farsamo yaqaan pom
-
+Total = 158
 ```
 
 You should see extracted rows, calculated total, provided total, difference, and review status.

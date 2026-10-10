@@ -24,3 +24,6 @@ backend/vendor/
 # Local databases
 backend/database/*.sqlite
 
+
+# Original local files saved before repository feature restoration
+.local-backup/
