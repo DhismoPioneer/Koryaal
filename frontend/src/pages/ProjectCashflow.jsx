@@ -287,7 +287,7 @@ export default function ProjectCashflow() {
               <Wallet size={14} />
               Deposit / Withdraw
             </div>
-            <h2 className="mt-4 text-3xl font-black tracking-tight lg:text-4xl">Project Cash Movement</h2>
+            <h2 className="mt-4 text-3xl font-black tracking-tight lg:text-4xl">Project Cashflow</h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-300">
               Record project deposits as income and withdrawals as expenses. Totals update the project financial balance.
             </p>
@@ -369,7 +369,7 @@ export default function ProjectCashflow() {
         </div>
 
         <div className="card space-y-4 p-6">
-          <h3 className="text-lg font-black text-slate-900">Project Calculation</h3>
+          <h3 className="text-lg font-black text-slate-900">Budget at a Glance</h3>
           <Metric label="Deposits" value={selectedProject?.income_amount || 0} color="text-emerald-700" />
           <Metric label="Withdrawals / Spent" value={selectedProject?.spent_amount || 0} color="text-rose-700" />
           <Metric label="Cash Balance" value={selectedProject?.cash_balance || 0} color="text-cyan-700" />
@@ -381,7 +381,7 @@ export default function ProjectCashflow() {
         <div className="border-b border-slate-100 bg-slate-50/50 p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h3 className="text-xl font-extrabold text-slate-900">Deposit / Withdraw History</h3>
+              <h3 className="text-xl font-extrabold text-slate-900">Money In & Out</h3>
               <p className="mt-1 text-xs font-semibold text-slate-400">
                 Track saved project cash movements by month and export them for finance review.
               </p>
@@ -413,18 +413,19 @@ export default function ProjectCashflow() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable project deposits and withdrawals">
           <table className="w-full min-w-[960px] text-sm">
+            <caption className="sr-only">Project deposits and withdrawals</caption>
             <thead className="border-b border-slate-100 bg-slate-50 font-extrabold text-slate-500">
               <tr>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Date</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Movement</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Description</th>
-                <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">Amount</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Payment</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Person</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Reference</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Report</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Date</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Movement</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Description</th>
+                <th scope="col" className="p-4 text-right text-[10px] font-black uppercase tracking-wider">Amount</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Payment</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Person</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Reference</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Report</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">

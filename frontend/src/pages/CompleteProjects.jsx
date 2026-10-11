@@ -102,18 +102,19 @@ export default function CompleteProjects() {
 
       <section className="card overflow-hidden">
         <div className="border-b border-slate-100 bg-slate-50/50 p-6">
-          <h3 className="text-xl font-extrabold text-slate-900">Projects Ready For Status Update</h3>
+          <h3 className="text-xl font-extrabold text-slate-900">Project Status</h3>
           <p className="text-xs text-slate-400">Complete or reopen project status without editing other project information.</p>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable project completion status">
           <table className="w-full min-w-[760px] text-sm">
+            <caption className="sr-only">Project completion status</caption>
             <thead className="border-b border-slate-100 bg-slate-50 text-slate-500">
               <tr>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Project</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Location</th>
-                <th className="p-4 text-center text-[10px] font-black uppercase tracking-wider">Status</th>
-                <th className="p-4 text-center text-[10px] font-black uppercase tracking-wider">End Date</th>
-                <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">Action</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Project</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Location</th>
+                <th scope="col" className="p-4 text-center text-[10px] font-black uppercase tracking-wider">Status</th>
+                <th scope="col" className="p-4 text-center text-[10px] font-black uppercase tracking-wider">End Date</th>
+                <th scope="col" className="p-4 text-right text-[10px] font-black uppercase tracking-wider">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">

@@ -10,6 +10,7 @@ import {
   BadgeDollarSign,
   TrendingDown,
   Scale,
+  ChevronDown,
 } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { saveAs } from 'file-saver'
@@ -193,15 +194,15 @@ export default function Reports() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold text-cyan-100">
               <FileText size={14} />
-              Financial Analytics
+              FINANCIAL WORKSPACE
             </div>
 
             <h2 className="mt-4 text-3xl font-black tracking-tight lg:text-4xl">
-              Reports Center
+              Monthly Reports
             </h2>
 
             <p className="mt-2 text-sm leading-relaxed text-slate-300">
-              Generate monthly financial audits for active projects and compile structured XLSX management reports.
+              See the month clearly. Review project expenses, check records, and export your report.
             </p>
           </div>
         </div>
@@ -229,7 +230,7 @@ export default function Reports() {
                 ))}
               </select>
               <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">
-                ?
+                <ChevronDown size={14} />
               </span>
             </div>
           </Field>
@@ -330,35 +331,36 @@ export default function Reports() {
               </p>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable monthly project transactions">
               <table className="w-full min-w-[900px] text-sm">
+            <caption className="sr-only">Monthly project transactions</caption>
                 <thead className="border-b border-slate-100 bg-slate-50 font-extrabold text-slate-500">
                   <tr>
-                    <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
                       Project Name
                     </th>
-                    <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
                       Description
                     </th>
-                    <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
                       Category
                     </th>
-                    <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
                       Qty
                     </th>
-                    <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
                       Rate
                     </th>
-                    <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
                       Amount
                     </th>
-                    <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
                       Payment
                     </th>
-                    <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
                       Review
                     </th>
-                    <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
                       Date
                     </th>
                   </tr>

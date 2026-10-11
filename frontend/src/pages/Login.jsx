@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Building2, KeyRound, Lock, Mail, LogIn, Phone, ShieldCheck } from 'lucide-react'
 import api from '../services/api'
 
@@ -304,13 +305,14 @@ export default function Login({ onLogin }) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8">
+      <Link to="/" className="absolute left-5 top-4 text-xs font-bold text-cyan-800 hover:underline">← Back to Koryaal</Link>
       <main className={`w-full ${mode === 'register' ? 'max-w-2xl' : 'max-w-md'}`}>
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-700 text-white shadow-sm">
             <Building2 size={23} />
           </div>
 
-          <h1 className="mt-4 text-xl font-black text-slate-950">BuildTrack AI</h1>
+          <h1 className="mt-4 text-xl font-black text-slate-950">Koryaal</h1>
           <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-400">
             Site Manager
           </p>

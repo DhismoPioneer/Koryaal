@@ -16,6 +16,7 @@ import {
   Compass,
   CreditCard,
   BookOpen,
+  ChevronDown,
 } from 'lucide-react'
 import api from '../services/api'
 import { parseWhatsAppReport } from '../utils/localParser'
@@ -362,12 +363,11 @@ export default function AddReport() {
               </div>
 
               <h2 className="mt-4 text-3xl font-black tracking-tight lg:text-4xl">
-                Parser Dashboard
+                Add a Site Report
               </h2>
 
               <p className="mt-2 text-sm leading-relaxed text-slate-300">
-                Paste engineer messages from WhatsApp to dynamically parse transactions,
-                audit math differences, and log values into active project accounts.
+                Paste a WhatsApp site update, review the extracted costs, and save a clear project record.
               </p>
             </div>
 
@@ -394,10 +394,10 @@ export default function AddReport() {
             <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <h3 className="text-xl font-extrabold text-slate-900">
-                  Report Parameters
+                  Report Details
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Bind entry details to a specific project.
+                  Choose your project and report date.
                 </p>
               </div>
 
@@ -440,7 +440,7 @@ export default function AddReport() {
                     ))}
                   </select>
                   <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">
-                    ?
+                    <ChevronDown size={14} />
                   </span>
                 </div>
               </Field>
@@ -489,7 +489,7 @@ export default function AddReport() {
 
               {selectedProjectCompleted && (
                 <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 text-xs font-extrabold text-rose-700">
-                  This project node is closed/completed. New reports are blocked.
+                  This project is completed. Reopen it before adding new reports.
                 </div>
               )}
 
@@ -521,7 +521,7 @@ export default function AddReport() {
                       <option>Other</option>
                     </select>
                     <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">
-                      ?
+                      <ChevronDown size={14} />
                     </span>
                   </div>
                 </Field>
@@ -704,29 +704,30 @@ Payment: EVC`}
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable extracted site report entries">
               <table className="w-full text-sm">
+            <caption className="sr-only">Extracted site report entries</caption>
                 <thead className="border-b border-slate-100 bg-slate-50 font-extrabold text-slate-500">
                   <tr>
-                    <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
                       Description
                     </th>
-                    <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
                       Category
                     </th>
-                    <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
                       Qty
                     </th>
-                    <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
                       Rate
                     </th>
-                    <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-right text-[10px] font-black uppercase tracking-wider">
                       Amount
                     </th>
-                    <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">
                       Method
                     </th>
-                    <th className="p-4 text-center text-[10px] font-black uppercase tracking-wider">
+                    <th scope="col" className="p-4 text-center text-[10px] font-black uppercase tracking-wider">
                       Verification
                     </th>
                   </tr>

@@ -18,6 +18,11 @@ import {
   ShieldCheck,
   Wifi,
   WifiOff,
+  ArrowUpRight,
+  MapPin,
+  MessageSquare,
+  FolderKanban,
+  ChevronDown,
 } from 'lucide-react'
 import {
   ResponsiveContainer,
@@ -32,6 +37,7 @@ import {
   Cell,
 } from 'recharts'
 import api from '../services/api'
+import WorkspaceBuilding from '../components/WorkspaceBuilding.jsx'
 
 export default function Dashboard({ authUser }) {
   const [dashboardData, setDashboardData] = useState({
@@ -52,6 +58,9 @@ export default function Dashboard({ authUser }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isOffline, setIsOffline] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const canSubmitReports = authUser?.role === 'admin' || (authUser?.permissions || []).includes('reports.create')
+  const canViewFinancials = ['admin', 'finance'].includes(authUser?.role) || (authUser?.permissions || []).includes('finance.view')
+  const canManageProjects = authUser?.role === 'admin' || (authUser?.permissions || []).includes('projects.manage')
 
   const fetchData = async (silent = false) => {
     if (!silent) setIsLoading(true)
@@ -524,145 +533,30 @@ export default function Dashboard({ authUser }) {
       <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
         <RefreshCcw className="h-10 w-10 animate-spin text-cyan-600" />
         <p className="text-sm font-bold text-slate-500">
-          Loading enterprise metrics...
+          Getting your workspace ready...
         </p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
-      <section className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-600/10">
-              <LayoutDashboard size={24} />
-            </div>
-
-            <div className="min-w-0">
-              <h2 className="text-3xl font-black tracking-tight text-slate-900">
-                Overview Dashboard
-              </h2>
-            </div>
-
-            {isOffline ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-black text-amber-700 ring-1 ring-inset ring-amber-600/10">
-                <WifiOff size={11} className="text-amber-500 animate-pulse" />
-                Demo Mode
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-black text-emerald-700 ring-1 ring-inset ring-emerald-600/10">
-                <Wifi size={11} className="text-emerald-500" />
-                Live Sync
-              </span>
-            )}
-          </div>
-
-          <p className="mt-2 text-sm font-medium text-slate-500">
-            Welcome back,{' '}
-            <span className="font-extrabold text-slate-700">{authUser?.name || 'Administrator'}</span> -
-            Analytics for{' '}
-            <span className="font-extrabold text-slate-700">
-              {isAll ? 'All Construction Projects' : selectedProject?.project_name}
-            </span>
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[200px]">
-            <select
-              value={selectedProjectId}
-              onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-slate-200 bg-white pl-10 pr-10 py-3.5 text-sm font-extrabold text-slate-700 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-50"
-            >
-              <option value="all">All Projects</option>
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.project_name}
-                </option>
-              ))}
-            </select>
-
-            <Compass
-              size={17}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-            />
-
-            <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 border-l border-slate-200 pl-2 text-slate-400">
-              ?
-            </div>
-          </div>
-
-          <button
-            onClick={() => fetchData(true)}
-            className="rounded-xl border border-slate-200 bg-white p-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-900 shadow-sm transition active:scale-95"
-            title="Refresh statistics"
-          >
-            <RefreshCcw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-          </button>
-
-          <Link to="/add-report" className="btn btn-primary">
-            <Plus size={18} />
-            Add Report
-          </Link>
-        </div>
+    <div className="dashboard-page space-y-8">
+      <section className="dashboard-heading">
+        <div><p className="ws-eyebrow">YOUR WORKSPACE, AT A GLANCE</p><h1>Hello, {authUser?.name?.split(' ')[0] || 'builder'}<span className="text-cyan-700">.</span></h1><p>A little clarity for everything you're building.</p></div>
+        <div className="dashboard-tools"><select value={selectedProjectId} aria-label="Filter dashboard by project" onChange={event => setSelectedProjectId(event.target.value)}><option value="all">All projects</option>{projects.map(project => <option key={project.id} value={project.id}>{project.project_name}</option>)}</select><button disabled={isRefreshing} onClick={() => fetchData(true)} aria-label="Refresh dashboard"><RefreshCcw size={16} className={isRefreshing ? 'animate-spin' : ''} /></button></div>
+      </section>
+      <section className="dashboard-hero">
+        <div className="dashboard-hero-copy"><p className="ws-eyebrow"><Building2 size={13} /> {companyName}</p><h2>Good work starts<br />with a <span>clear picture.</span></h2><p>Your projects, reports, and finances, connected. See what's moving and make your next step count.</p><div className="dashboard-hero-links">{canSubmitReports && <Link to="/add-report" className="btn btn-primary"><Plus size={15} /> Add a site report</Link>}<Link to="/projects">Explore your projects <ArrowUpRight size={15} /></Link></div></div>
+        <span className={`ws-hero-status ${isOffline ? 'offline' : ''}`}><i />{isOffline ? 'Sample data / API unavailable' : `${companyStatus === 'active' ? 'Active' : companyStatus} workspace / ${userRole}`}</span>
+        <WorkspaceBuilding count={projects.length} />
+      </section>
+      <section className="ws-quick-grid" aria-label="Quick actions">
+        {canSubmitReports && <Link className="ws-quick-action" to="/add-report"><span><MessageSquare size={20} /></span><div><strong>From field to report</strong><p>Turn site messages into clear records</p></div><ArrowUpRight size={17} /></Link>}
+        <Link className="ws-quick-action" to={canManageProjects ? '/projects/add' : '/projects'}><span><FolderKanban size={20} /></span><div><strong>{canManageProjects ? 'Start something new' : 'Keep projects moving'}</strong><p>{canManageProjects ? 'Set up your next construction project' : 'Explore your assigned projects'}</p></div><ArrowUpRight size={17} /></Link>
+        {canViewFinancials && <Link className="ws-quick-action" to="/reports"><span><Wallet size={20} /></span><div><strong>Follow the finances</strong><p>Review expenses and monthly reports</p></div><ArrowUpRight size={17} /></Link>}
       </section>
 
-      <section className="grid gap-6">
-        <div className="card overflow-hidden p-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-600/10">
-                <Building2 size={26} />
-              </div>
-
-              <div>
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
-                  Current Company Workspace
-                </p>
-                <h3 className="mt-1 text-2xl font-black text-slate-950">
-                  {companyName}
-                </h3>
-                <p className="mt-1 text-xs font-semibold text-slate-500">
-                  This dashboard is filtered by the logged-in company only.
-                </p>
-              </div>
-            </div>
-
-            <span
-              className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-black ring-1 ring-inset ${
-                companyStatus === 'active'
-                  ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/10'
-                  : 'bg-slate-100 text-slate-600 ring-slate-600/10'
-              }`}
-            >
-              {companyStatus === 'active' ? 'Active Company' : companyStatus}
-            </span>
-          </div>
-        </div>
-
-        <div className="card p-6">
-          <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-600/10">
-              <ShieldCheck size={23} />
-            </div>
-
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
-                Access Role
-              </p>
-              <p className="mt-2 text-2xl font-black capitalize text-slate-950">
-                {userRole}
-              </p>
-              <p className="mt-2 text-xs font-semibold text-slate-500">
-                Your dashboard data is private to this company workspace.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="dashboard-stat-grid" aria-label="Key project figures">
         <div className="card p-6 hover:-translate-y-1 hover:shadow-xl hover:border-cyan-200/50 group">
           <div className="flex items-start justify-between">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 group-hover:scale-110 transition duration-300">
@@ -702,12 +596,12 @@ export default function Dashboard({ authUser }) {
             </div>
 
             <span className="rounded-full bg-rose-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-rose-600">
-              +12% MoM
+              This month
             </span>
           </div>
 
           <p className="mt-6 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
-            Active Outflow
+            Monthly Expenses
           </p>
 
           <h3 className="mt-1 text-3xl font-black text-slate-950">
@@ -741,7 +635,7 @@ export default function Dashboard({ authUser }) {
           </div>
 
           <p className="mt-6 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
-            Audit Transactions
+            Recorded Transactions
           </p>
 
           <h3 className="mt-1 text-3xl font-black text-slate-950">
@@ -787,7 +681,7 @@ export default function Dashboard({ authUser }) {
           </div>
 
           <p className="mt-6 text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
-            {isAll ? 'Active Node Count' : 'Project Status'}
+            {isAll ? 'Active Projects' : 'Project Status'}
           </p>
 
           <h3 className="mt-1 text-3xl font-black text-slate-950">
@@ -814,12 +708,26 @@ export default function Dashboard({ authUser }) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-3">
+      <section className="ws-project-showcase" aria-label="Interactive project overview">
+        <div className="ws-project-heading"><div><h2>What you're building</h2><p>Choose a project to focus the figures and charts below.</p></div><Link to="/projects">All projects <ArrowUpRight size={15} /></Link></div>
+        <div className="ws-project-grid">{projects.slice(0, 3).map((project, index) => {
+          const projectBudget = Number(project.budget || 0)
+          const progress = projectBudget > 0 ? Math.max(0, Math.min(100, Math.round(Number(project.spent_amount || 0) / projectBudget * 100))) : 0
+          const status = { in_progress: 'In progress', completed: 'Completed', pending: 'Pending', delayed: 'Delayed' }[project.status] || project.status || 'Pending'
+          return <button key={project.id} className={`ws-project-card ${String(selectedProjectId) === String(project.id) ? 'is-selected' : ''}`} aria-pressed={String(selectedProjectId) === String(project.id)} onClick={() => setSelectedProjectId(String(project.id))}>
+            <div className="ws-project-art"><span>PROJECT / {String(index + 1).padStart(2, '0')}</span><ArrowUpRight size={16} /><WorkspaceBuilding /></div>
+            <div className="ws-project-copy"><h3 title={project.project_name}>{project.project_name}</h3><p className="ws-project-location"><MapPin size={11} />{project.location || 'Location not set'}</p><div className="ws-project-card-bottom"><span className={`ws-project-status status-${project.status}`}>{status}</span>{canViewFinancials && <span>{projectBudget > 0 ? `${progress}% budget used` : 'No budget set'}</span>}</div>{canViewFinancials && <div className="ws-project-meter"><i style={{ width: `${progress}%` }} /></div>}</div>
+          </button>
+        })}</div>
+        {projects.length === 0 && <div className="ws-project-empty"><FolderKanban size={30} /><strong>A place for your next big idea.</strong><p>Your projects will appear here once they're added.</p>{canManageProjects && <Link to="/projects/add" className="btn btn-primary"><Plus size={15} /> Create your first project</Link>}</div>}
+        {!isAll && <button className="ws-project-clear" onClick={() => setSelectedProjectId('all')}>Show figures for all projects</button>}
+      </section>
+      <section className="dashboard-chart-grid">
         <div className="card p-6 xl:col-span-2">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-xl font-extrabold text-slate-900">
-                Financial Trend Analysis
+                Budget & spending
               </h3>
               <p className="text-xs text-slate-400">
                 Monthly project budgeting vs actual resource spending
@@ -828,12 +736,12 @@ export default function Dashboard({ authUser }) {
 
             <div className="flex items-center gap-4 text-xs font-black text-slate-500">
               <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-[#0891b2]" />
+                <span className="h-3 w-3 rounded-full bg-[#48846f]" />
                 Budget
               </span>
 
               <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-[#4f46e5]" />
+                <span className="h-3 w-3 rounded-full bg-[#a88c59]" />
                 Actual Spent
               </span>
             </div>
@@ -847,13 +755,13 @@ export default function Dashboard({ authUser }) {
               >
                 <defs>
                   <linearGradient id="colorBudget" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0891b2" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#0891b2" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#48846f" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#48846f" stopOpacity={0} />
                   </linearGradient>
 
                   <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#a88c59" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#a88c59" stopOpacity={0} />
                   </linearGradient>
                 </defs>
 
@@ -883,7 +791,7 @@ export default function Dashboard({ authUser }) {
                   name="Budget"
                   type="monotone"
                   dataKey="Budget"
-                  stroke="#0891b2"
+                  stroke="#48846f"
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#colorBudget)"
@@ -893,7 +801,7 @@ export default function Dashboard({ authUser }) {
                   name="Actual Spent"
                   type="monotone"
                   dataKey="Actual"
-                  stroke="#4f46e5"
+                  stroke="#a88c59"
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#colorActual)"
@@ -905,7 +813,7 @@ export default function Dashboard({ authUser }) {
 
         <div className="card p-6 flex flex-col justify-between">
           <div>
-            <h3 className="text-xl font-extrabold text-slate-900">Project Health</h3>
+            <h3 className="text-xl font-extrabold text-slate-900">Budget Health</h3>
             <p className="text-xs text-slate-400">
               Total project spending limits indicator
             </p>
@@ -934,8 +842,8 @@ export default function Dashboard({ authUser }) {
 
                 <defs>
                   <linearGradient id="gaugeCyanGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#06b6d4" />
-                    <stop offset="100%" stopColor="#0891b2" />
+                    <stop offset="0%" stopColor="#81a67c" />
+                    <stop offset="100%" stopColor="#48846f" />
                   </linearGradient>
                 </defs>
               </PieChart>
@@ -963,12 +871,12 @@ export default function Dashboard({ authUser }) {
             className="mt-6 flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-3.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition"
           >
             <TrendingUp size={15} />
-            View Detailed Audit Logs
+            Explore financial reports
           </Link>
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-2">
+      <section className="dashboard-detail-grid grid gap-6 xl:grid-cols-2">
         <div className="card p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -1018,7 +926,7 @@ export default function Dashboard({ authUser }) {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-extrabold text-slate-900">
-                Activity & Logs
+                Recent Activity
               </h3>
               <p className="text-xs text-slate-400">
                 Parsed items and sync stream

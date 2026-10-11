@@ -305,7 +305,7 @@ export default function Users({ mode = 'list' }) {
               {isAddMode ? 'Add User' : 'Users'}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-300">
-              {isAddMode ? 'Create a team member, assign their role, permissions, and project access.' : 'Manage team members, project visibility, account status, and role-based permissions for BuildTrack AI.'}
+              {isAddMode ? 'Create a team member, assign their role, permissions, and project access.' : 'Bring your team together. Manage roles, project access, and account settings.'}
             </p>
           </div>
 
@@ -511,24 +511,25 @@ export default function Users({ mode = 'list' }) {
       {!isAddMode && (
       <section className="card overflow-hidden">
         <div className="border-b border-slate-100 bg-slate-50/50 p-6">
-          <h3 className="text-xl font-extrabold text-slate-900">User Directory</h3>
+          <h3 className="text-xl font-extrabold text-slate-900">Your Team</h3>
           <p className="mt-1 text-xs text-slate-400">
             Team members with role and project access assignments.
           </p>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable team members and access roles">
           <table className="w-full min-w-[1080px] text-sm">
+            <caption className="sr-only">Team members and access roles</caption>
             <thead className="border-b border-slate-100 bg-slate-50 font-extrabold text-slate-500">
               <tr>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Name</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Email</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Phone</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Role</th>
-                <th className="p-4 text-center text-[10px] font-black uppercase tracking-wider">Status</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Assigned Projects</th>
-                <th className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Last Updated</th>
-                <th className="p-4 text-right text-[10px] font-black uppercase tracking-wider">Actions</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Name</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Email</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Phone</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Role</th>
+                <th scope="col" className="p-4 text-center text-[10px] font-black uppercase tracking-wider">Status</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Assigned Projects</th>
+                <th scope="col" className="p-4 text-left text-[10px] font-black uppercase tracking-wider">Last Updated</th>
+                <th scope="col" className="p-4 text-right text-[10px] font-black uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
 

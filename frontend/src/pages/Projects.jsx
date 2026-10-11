@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   FolderKanban,
   PlusCircle,
@@ -15,6 +16,7 @@ import {
   DollarSign,
   ChevronDown,
   FileText,
+  Search,
 } from 'lucide-react'
 import api from '../services/api'
 
@@ -52,6 +54,8 @@ export default function Projects({ authUser }) {
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState(null)
   const [selectedProjectId, setSelectedProjectId] = useState('all')
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
 
   useEffect(() => {
     loadProjects()
@@ -243,9 +247,12 @@ export default function Projects({ authUser }) {
   const delayedOrOverBudget = delayedProjects + overBudgetProjects
 
   const selectedProjects = useMemo(() => {
-    if (selectedProjectId === 'all') return projects
-    return projects.filter((project) => String(project.id) === String(selectedProjectId))
-  }, [projects, selectedProjectId])
+    return projects.filter(project =>
+      (selectedProjectId === 'all' || String(project.id) === String(selectedProjectId)) &&
+      (statusFilter === 'all' || project.status === statusFilter) &&
+      `${project.project_name || ''} ${project.location || ''}`.toLowerCase().includes(search.toLowerCase())
+    )
+  }, [projects, selectedProjectId, search, statusFilter])
 
   return (
     <div className="space-y-8 animate-fade-in-up">
@@ -257,7 +264,7 @@ export default function Projects({ authUser }) {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold text-cyan-100">
               <FolderKanban size={14} />
-              {isClient ? 'Project Progress' : 'Project Administration'}
+              {isClient ? 'Project Progress' : 'PROJECT WORKSPACE'}
             </div>
 
             <h2 className="mt-4 text-3xl font-black tracking-tight lg:text-4xl">
@@ -267,11 +274,12 @@ export default function Projects({ authUser }) {
             <p className="mt-2 text-sm leading-relaxed text-slate-300">
               {isClient
                 ? 'View assigned construction project progress, timeline, and delivery status.'
-                : 'Initialize, budget, and oversee status and contract spending limits for all active project nodes.'}
+                : 'Keep your projects, budgets, and timelines moving in the right direction.'}
             </p>
           </div>
 
           <div className="flex gap-3">
+            {canManageProjects && <Link to="/projects/add" className="btn btn-primary"><PlusCircle size={16} /> New Project</Link>}
             <button
               onClick={loadProjects}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/10 px-5 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-white/20 active:scale-95 transition"
@@ -334,10 +342,10 @@ export default function Projects({ authUser }) {
           <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
             <div>
               <h3 className="text-xl font-extrabold text-slate-900">
-                {editingProject ? 'Edit Project Config' : 'Initialize New Project'}
+                {editingProject ? 'Edit Project' : 'Create New Project'}
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                {editingProject ? 'Update current parameters.' : 'Add a new construction node.'}
+                {editingProject ? 'Update the project details.' : 'Set up a new construction project.'}
               </p>
             </div>
 
@@ -419,7 +427,7 @@ export default function Projects({ authUser }) {
                     <option value="delayed">Delayed / Over Budget</option>
                   </select>
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-xs">
-                    ?
+                    <ChevronDown size={14} />
                   </span>
                 </div>
               </Field>
@@ -451,7 +459,7 @@ export default function Projects({ authUser }) {
                 className="btn btn-primary"
               >
                 <Save size={17} />
-                {saving ? 'Saving...' : editingProject ? 'Save Configuration' : 'Initialize Project'}
+                {saving ? 'Saving...' : editingProject ? 'Save Changes' : 'Create Project'}
               </button>
             </div>
           </form>
@@ -460,15 +468,21 @@ export default function Projects({ authUser }) {
 
       {/* Projects Table Card */}
       <section className="card overflow-hidden">
+        <div className="ws-table-toolbar">
+          <label className="ws-table-search"><Search size={15} /><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Find a project or location..." aria-label="Search projects by name or location" /></label>
+          <select aria-label="Filter projects by status" value={statusFilter} onChange={event => setStatusFilter(event.target.value)}><option value="all">All statuses</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="pending">Pending</option><option value="delayed">Delayed</option></select>
+          <span>{selectedProjects.length} of {projects.length} projects</span>
+          {(search || statusFilter !== 'all' || selectedProjectId !== 'all') && <button onClick={() => { setSearch(''); setStatusFilter('all'); setSelectedProjectId('all') }}>Clear filters <X size={12} /></button>}
+        </div>
         <div className="border-b border-slate-100 p-6 bg-slate-50/50 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xl font-extrabold text-slate-900">
-              {isClient ? 'Assigned Project Progress' : 'Project Registries'}
+              {isClient ? 'Assigned Project Progress' : 'Your Projects'}
             </h3>
             <p className="text-xs text-slate-400 mt-1">
               {isClient
                 ? 'Read-only status for projects assigned to your client account.'
-                : 'Active construction nodes with real-time budget limits and validation controls.'}
+                : 'Find a project, check its budget, and take the next step.'}
             </p>
           </div>
 
@@ -486,13 +500,14 @@ export default function Projects({ authUser }) {
               ))}
             </select>
             <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-xs">
-              ?
+              <ChevronDown size={14} />
             </span>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className={`w-full table-fixed text-sm ${isClient ? 'min-w-[840px]' : 'min-w-[1180px]'}`}>
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable projects, budgets, timelines and status">
+          <table className={`ws-project-table w-full table-fixed text-sm ${isClient ? 'min-w-[840px]' : 'min-w-[1100px]'}`}>
+            <caption className="sr-only">Projects, budgets, timelines and status</caption>
             {isClient ? (
               <colgroup>
                 <col className="w-[220px]" />
@@ -512,32 +527,32 @@ export default function Projects({ authUser }) {
                 <col className="w-[110px]" />
                 <col className="w-[110px]" />
                 <col className="w-[110px]" />
-                <col className="w-[200px]" />
+                <col className="w-[120px]" />
               </colgroup>
             )}
 
             <thead className="bg-slate-50 text-slate-500 font-extrabold border-b border-slate-100">
               <tr>
-                <th className="p-4 text-left font-black tracking-wider text-[10px] uppercase">Project Name</th>
-                <th className="p-4 text-left font-black tracking-wider text-[10px] uppercase">Location</th>
+                <th scope="col" className="p-4 text-left font-black tracking-wider text-[10px] uppercase">Project Name</th>
+                <th scope="col" className="p-4 text-left font-black tracking-wider text-[10px] uppercase">Location</th>
                 {!isClient && (
                   <>
                 {canViewFinancials && (
                   <>
-                    <th className="p-4 text-right font-black tracking-wider text-[10px] uppercase">Budget</th>
-                    <th className="p-4 text-right font-black tracking-wider text-[10px] uppercase">Spent</th>
-                    <th className="p-4 text-right font-black tracking-wider text-[10px] uppercase">Remaining</th>
+                    <th scope="col" className="p-4 text-right font-black tracking-wider text-[10px] uppercase">Budget</th>
+                    <th scope="col" className="p-4 text-right font-black tracking-wider text-[10px] uppercase">Spent</th>
+                    <th scope="col" className="p-4 text-right font-black tracking-wider text-[10px] uppercase">Remaining</th>
                   </>
                 )}
                   </>
                 )}
-                <th className="p-4 text-center font-black tracking-wider text-[10px] uppercase">Start Date</th>
-                <th className="p-4 text-center font-black tracking-wider text-[10px] uppercase">End Date</th>
-                <th className="p-4 text-center font-black tracking-wider text-[10px] uppercase">Status</th>
+                <th scope="col" className="p-4 text-center font-black tracking-wider text-[10px] uppercase">Start Date</th>
+                <th scope="col" className="p-4 text-center font-black tracking-wider text-[10px] uppercase">End Date</th>
+                <th scope="col" className="p-4 text-center font-black tracking-wider text-[10px] uppercase">Status</th>
                 {!showProjectActions ? (
-                  <th className="p-4 text-left font-black tracking-wider text-[10px] uppercase">Progress</th>
+                  <th scope="col" className="p-4 text-left font-black tracking-wider text-[10px] uppercase">Progress</th>
                 ) : (
-                <th className="p-4 text-right font-black tracking-wider text-[10px] uppercase">Actions</th>
+                <th scope="col" className="p-4 text-right font-black tracking-wider text-[10px] uppercase">Actions</th>
                 )}
               </tr>
             </thead>
@@ -589,7 +604,8 @@ export default function Projects({ authUser }) {
                         <button
                           onClick={() => startEdit(project)}
                           className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 transition"
-                          title="Edit project parameters"
+                          title="Edit project"
+                          aria-label={`Edit ${project.project_name}`}
                         >
                           <Pencil size={13} />
                         </button>
@@ -615,7 +631,8 @@ export default function Projects({ authUser }) {
                         <button
                           onClick={() => deleteProject(project)}
                           className="rounded-lg bg-rose-50 p-2 text-rose-600 hover:bg-rose-100 transition ring-1 ring-rose-500/10"
-                          title="Delete Project Node"
+                          title="Delete project"
+                          aria-label={`Delete ${project.project_name}`}
                         >
                           <Trash2 size={13} />
                         </button>
@@ -630,13 +647,14 @@ export default function Projects({ authUser }) {
               {selectedProjects.length === 0 && (
                 <tr>
                   <td colSpan={isClient ? 6 : 9} className="p-12 text-center font-bold text-slate-400">
-                    {isClient ? 'No assigned projects found.' : 'No project registries found.'}
+                    {search || statusFilter !== 'all' || selectedProjectId !== 'all' ? 'No matching projects. Try another search or clear your filters.' : isClient ? 'No assigned projects found.' : 'Your projects will appear here once added.'}
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+        <p className="ws-scroll-hint"><ChevronDown size={12} className="-rotate-90" /> Scroll sideways to explore all project details.</p>
       </section>
     </div>
   )
